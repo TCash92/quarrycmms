@@ -81,3 +81,49 @@ export const ASSET_STATUS = {
   limited: { label: 'Limited', color: '#FBC02D' },
   down: { label: 'Down', color: '#D32F2F' },
 } as const;
+
+/**
+ * Work order status with display info
+ */
+export const WORK_ORDER_STATUS = {
+  open: { label: 'Open', color: '#2196F3' },
+  in_progress: { label: 'In Progress', color: '#FF9800' },
+  completed: { label: 'Completed', color: '#4CAF50' },
+} as const;
+
+/**
+ * Failure types for work order completion
+ */
+export const FAILURE_TYPES = {
+  none: { label: 'None', color: '#388E3C' },
+  wore_out: { label: 'Wore Out', color: '#FBC02D' },
+  broke: { label: 'Broke', color: '#D32F2F' },
+  unknown: { label: 'Unknown', color: '#9E9E9E' },
+} as const;
+
+/**
+ * Quick Log action types with display info and priority mapping
+ * Per CMMS_MVP_Design_Guide_v6.md Week 13 requirements
+ */
+export const QUICK_LOG_ACTIONS = {
+  emergency_repair: {
+    label: 'Emergency / Repair',
+    color: '#D32F2F',
+    priority: 'high' as const,
+    titlePrefix: 'Emergency Repair:',
+  },
+  maintenance_pm: {
+    label: 'Maintenance / PM',
+    color: '#1976D2',
+    priority: 'medium' as const,
+    titlePrefix: 'PM:',
+  },
+  inspection: {
+    label: 'Inspection',
+    color: '#388E3C',
+    priority: 'low' as const,
+    titlePrefix: 'Inspection:',
+  },
+} as const;
+
+export type QuickLogActionType = keyof typeof QUICK_LOG_ACTIONS;

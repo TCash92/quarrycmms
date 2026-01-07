@@ -7,6 +7,8 @@ import {
   EXPO_PUBLIC_ENABLE_ANALYTICS,
   EXPO_PUBLIC_LOG_LEVEL,
   EXPO_PUBLIC_SHOW_SYNC_DEBUG,
+  EXPO_PUBLIC_SENTRY_DSN,
+  EXPO_PUBLIC_ENVIRONMENT,
 } from '@env';
 
 export interface AppConfig {
@@ -18,6 +20,10 @@ export interface AppConfig {
   enableAnalytics: boolean;
   logLevel: 'debug' | 'info' | 'warn' | 'error';
   showSyncDebug: boolean;
+  /** Sentry DSN for crash reporting (null to disable) */
+  sentryDsn: string | null;
+  /** Environment name */
+  environment: 'development' | 'staging' | 'production';
 }
 
 function parseBoolean(value: string | undefined, defaultValue: boolean): boolean {
@@ -33,6 +39,15 @@ function parseLogLevel(value: string | undefined): AppConfig['logLevel'] {
   return 'debug';
 }
 
+function parseEnvironment(value: string | undefined): AppConfig['environment'] {
+  const validEnvs: AppConfig['environment'][] = ['development', 'staging', 'production'];
+  if (value && validEnvs.includes(value as AppConfig['environment'])) {
+    return value as AppConfig['environment'];
+  }
+  // Default to development, unless we're in a non-dev build
+  return __DEV__ ? 'development' : 'production';
+}
+
 export const config: AppConfig = {
   supabaseUrl: EXPO_PUBLIC_SUPABASE_URL ?? '',
   supabaseAnonKey: EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '',
@@ -42,6 +57,8 @@ export const config: AppConfig = {
   enableAnalytics: parseBoolean(EXPO_PUBLIC_ENABLE_ANALYTICS, false),
   logLevel: parseLogLevel(EXPO_PUBLIC_LOG_LEVEL),
   showSyncDebug: parseBoolean(EXPO_PUBLIC_SHOW_SYNC_DEBUG, false),
+  sentryDsn: EXPO_PUBLIC_SENTRY_DSN || null,
+  environment: parseEnvironment(EXPO_PUBLIC_ENVIRONMENT),
 };
 
 export class ConfigurationError extends Error {

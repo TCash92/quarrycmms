@@ -217,7 +217,7 @@ export const schema = appSchema({
 ```typescript
 // POST /auth/v1/token?grant_type=password
 const { data, error } = await supabase.auth.signInWithPassword({
-  email: 'dave@quarry.ca',
+  email: 'testuser@example.com',
   password: '...'
 });
 
@@ -578,6 +578,32 @@ Test all 40 scenarios in Part 3 of CMMS_MVP_Design_Guide_v6.md
 
 ---
 
+## Database Development (supabase-local MCP)
+
+The backend uses self-hosted Supabase at `your-project.supabase.co`. Claude Code can access the database directly via the `supabase-local` MCP server.
+
+**Available MCP Tools:**
+- `mcp__supabase-local__list_tables` - View database schema
+- `mcp__supabase-local__execute_sql` - Run SQL queries
+- `mcp__supabase-local__list_auth_users` - Manage test users
+- `mcp__supabase-local__generate_typescript_types` - Generate types from schema
+
+**Example Usage:**
+```
+# List all tables
+Use: list_tables tool
+
+# Query work orders
+Use: execute_sql with: SELECT * FROM work_orders LIMIT 5;
+
+# Generate types for this project
+Use: generate_typescript_types with output_path: /home/ubuntu/franken-erp/apps/quarrycmms/src/types/database.types.ts
+```
+
+**Setup**: See `compose/master-stack/CLAUDE.md` for MCP installation details.
+
+---
+
 ## Quick Reference Commands
 
 ```bash
@@ -600,6 +626,32 @@ npm run typecheck
 # Test
 npm run test
 ```
+
+---
+
+## Installed Plugins & MCP Servers
+
+### Critical for This Project
+
+| Plugin | Commands | Use Case |
+|--------|----------|----------|
+| **supabase-local** | (MCP tools) | Database queries, schema management, type generation |
+| **typescript-lsp** | (MCP tools) | TypeScript strict mode navigation |
+| **context7** | (MCP tools) | React Native, Expo, WatermelonDB documentation |
+| **security-guidance** | (agent) | Offline sync security, crypto signature review |
+| **commit-commands** | `/commit`, `/commit-push-pr` | Git workflow automation |
+
+### Workflow Plugins
+
+| Plugin | Commands | Use Case |
+|--------|----------|----------|
+| **code-review** | `/code-review` | Review offline-first patterns |
+| **pr-review-toolkit** | `/review-pr` | Comprehensive PR review |
+| **feature-dev** | `/feature-dev` | Guided feature implementation |
+| **hookify** | `/hookify` | Enforce no hardcoded values, sync_status tracking |
+
+### All Available Plugins
+See root `/CLAUDE.md` for complete list of 14 installed plugins.
 
 ---
 
