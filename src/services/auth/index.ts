@@ -1,3 +1,11 @@
-// Authentication services - implemented in PR #4
-// Will contain: auth-service.ts, auth-storage.ts
-export {};
+// Authentication services
+export { AuthProvider, useAuthContext } from './AuthProvider';
+export { signIn, signOut, ensureValidToken, restoreSession } from './auth-service';
+export { getSupabaseClient, resetSupabaseClient } from './supabase-client';
+export {
+  storeAuthData,
+  getStoredAuthData,
+  clearAuthData,
+  isTokenValid,
+  isRefreshTokenValid,
+} from './auth-storage';

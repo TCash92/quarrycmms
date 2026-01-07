@@ -34,14 +34,12 @@ yarn-error.*
 .claude/
 
 # local env files
-.env*.local
 .env
-
-# Keep example and default env files tracked
+.env.local
+.env.development
+.env.staging
+.env.production
 !.env.example
-!.env.development
-!.env.staging
-!.env.production
 
 # typescript
 *.tsbuildinfo

@@ -7,4 +7,6 @@ declare module '@env' {
   export const EXPO_PUBLIC_ENABLE_ANALYTICS: string;
   export const EXPO_PUBLIC_LOG_LEVEL: string;
   export const EXPO_PUBLIC_SHOW_SYNC_DEBUG: string;
+  export const EXPO_PUBLIC_SENTRY_DSN: string;
+  export const EXPO_PUBLIC_ENVIRONMENT: string;
 }

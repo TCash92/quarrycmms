@@ -717,7 +717,7 @@ function generateVerificationCode(hash: string): string {
 **Solution: Dual Verification**
 
 ### Method 1: Online Verification (Primary)
-- QR code links to `https://verify.quarrycmms.ca/{verification_code}`
+- QR code links to `https://verify.example.com/{verification_code}`
 - Edge Function looks up work order by code, recalculates hash, compares
 
 ### Method 2: Offline Verification (Backup)
@@ -874,7 +874,7 @@ codes provided.
 
 Package Integrity Hash: [SHA-256 of entire package contents]
 
-For verification assistance: compliance@quarrycmms.ca
+For verification assistance: support@example.com
 ```
 
 ## 5.3 PDF Generation Performance
@@ -1594,7 +1594,7 @@ POST /auth/v1/token?grant_type=password
 Content-Type: application/json
 
 {
-  "email": "dave@quarry.ca",
+  "email": "testuser@example.com",
   "password": "..."
 }
 
@@ -2638,7 +2638,7 @@ Tests:
 | Supabase project (prod) | ☐ | IT/Ops | Week 20 |
 | Apple Developer account | ☐ | Client | Week 18 |
 | Google Play Console | ☐ | Client | Week 18 |
-| Domain: verify.quarrycmms.ca | ☐ | Client | Week 14 |
+| Domain: verify.example.com | ☐ | Client | Week 14 |
 | Test devices (2-3 rugged) | ☐ | Client | Week 4 |
 | Sentry account | ☐ | Dev lead | Week 18 |
 

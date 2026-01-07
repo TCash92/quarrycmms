@@ -14,7 +14,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.quarrycmms.app"
+      "bundleIdentifier": "com.quarrycmms.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -32,6 +35,25 @@
       "eas": {
         "projectId": "your-eas-project-id"
       }
-    }
+    },
+    "plugins": [
+      [
+        "@morrowdigital/watermelondb-expo-plugin"
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "newArchEnabled": true
+          },
+          "android": {
+            "kotlinVersion": "1.8.10",
+            "newArchEnabled": true
+          }
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "owner": "your-expo-username"
   }
 }

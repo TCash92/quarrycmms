@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { RootNavigator } from '@/app';
-import { validateConfig, ConfigurationError } from '@/config';
+import { validateConfig, ConfigurationError, config } from '@/config';
+import { DatabaseProvider } from '@/database';
+import { AuthProvider } from '@/services/auth/AuthProvider';
+import {
+  initMonitoring,
+  logger,
+  schedulePeriodicTelemetry,
+  stopPeriodicTelemetry,
+} from '@/services/monitoring';
+import { checkDatabaseHealth, DatabaseHealthReport } from '@/services/recovery';
 
 /**
  * Application entry point
@@ -12,22 +21,68 @@ import { validateConfig, ConfigurationError } from '@/config';
 export default function App(): React.ReactElement {
   const [configError, setConfigError] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [dbHealthReport, setDbHealthReport] = useState<DatabaseHealthReport | null>(null);
 
   useEffect(() => {
     const initializeApp = async (): Promise<void> => {
       try {
+        // Initialize monitoring first (before config validation can fail)
+        initMonitoring({
+          sentryDsn: config.sentryDsn,
+          environment: config.environment,
+          enablePerformance: true,
+          enableAnalytics: config.enableAnalytics,
+          sampleRate: 0.1, // 10% of transactions
+        });
+
         validateConfig();
+
+        // Run database health check
+        try {
+          const healthReport = await checkDatabaseHealth();
+          setDbHealthReport(healthReport);
+
+          if (!healthReport.healthy) {
+            logger.warn('Database health issues detected', {
+              category: 'app',
+              integrityErrors: healthReport.integrityErrors.length,
+              recommendations: healthReport.recommendations,
+            });
+
+            // Show alert to user about database issues
+            Alert.alert(
+              'Database Issue Detected',
+              'Some database issues were detected. You can continue using the app, but consider going to Settings > Reset Local Database if you experience problems.',
+              [{ text: 'OK', style: 'default' }]
+            );
+          }
+        } catch (healthError) {
+          logger.error('Database health check failed', healthError as Error, { category: 'app' });
+          // Continue app initialization even if health check fails
+        }
+
+        // Start periodic telemetry collection (every 4 hours)
+        schedulePeriodicTelemetry(4 * 60 * 60 * 1000);
+
+        logger.info('App initialized successfully', { category: 'app' });
         setIsReady(true);
       } catch (error) {
         if (error instanceof ConfigurationError) {
+          logger.error('Configuration error', error, { category: 'app' });
           setConfigError(error.message);
         } else {
+          logger.error('Initialization error', error as Error, { category: 'app' });
           setConfigError('An unexpected error occurred during initialization');
         }
       }
     };
 
     void initializeApp();
+
+    // Cleanup on unmount
+    return () => {
+      stopPeriodicTelemetry();
+    };
   }, []);
 
   // Show configuration error screen if validation fails
@@ -57,7 +112,11 @@ export default function App(): React.ReactElement {
   return (
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
-        <RootNavigator />
+        <DatabaseProvider>
+          <AuthProvider>
+            <RootNavigator />
+          </AuthProvider>
+        </DatabaseProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

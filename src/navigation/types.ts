@@ -8,20 +8,47 @@ import type { CompositeScreenProps, NavigatorScreenParams } from '@react-navigat
  */
 export type RootStackParamList = {
   Main: NavigatorScreenParams<MainTabParamList>;
-  // Auth screens will be added in PR #4
-  // Login: undefined;
+  Login: undefined;
 };
 
 /**
  * Main tab navigator parameter list
- * Placeholder for future tab implementation
  */
 export type MainTabParamList = {
-  Home: undefined;
-  // These will be added in later PRs:
-  // Assets: undefined;
-  // WorkOrders: undefined;
-  // QuickLog: undefined;
+  Home: NavigatorScreenParams<HomeStackParamList>;
+  Assets: NavigatorScreenParams<AssetsStackParamList>;
+  WorkOrders: NavigatorScreenParams<WorkOrdersStackParamList>;
+  QuickLog: undefined;
+};
+
+/**
+ * Home stack navigator parameter list
+ */
+export type HomeStackParamList = {
+  HomeMain: undefined;
+  SyncDetails: undefined;
+  ComplianceReport: undefined;
+  Settings: undefined;
+  DatabaseReset: undefined;
+  DeviceMigration: { mode: 'send' | 'receive' };
+  Help: undefined;
+};
+
+/**
+ * Assets stack navigator parameter list
+ */
+export type AssetsStackParamList = {
+  AssetList: undefined;
+  AssetDetail: { assetId: string };
+};
+
+/**
+ * Work orders stack navigator parameter list
+ */
+export type WorkOrdersStackParamList = {
+  WorkOrderList: undefined;
+  CreateWorkOrder: { assetId?: string };
+  WorkOrderDetail: { workOrderId: string };
 };
 
 /**
@@ -38,6 +65,30 @@ export type RootStackScreenProps<T extends keyof RootStackParamList> = NativeSta
 export type MainTabScreenProps<T extends keyof MainTabParamList> = CompositeScreenProps<
   BottomTabScreenProps<MainTabParamList, T>,
   RootStackScreenProps<keyof RootStackParamList>
+>;
+
+/**
+ * Type helper for home stack screens
+ */
+export type HomeStackScreenProps<T extends keyof HomeStackParamList> = NativeStackScreenProps<
+  HomeStackParamList,
+  T
+>;
+
+/**
+ * Type helper for assets stack screens
+ */
+export type AssetsStackScreenProps<T extends keyof AssetsStackParamList> = NativeStackScreenProps<
+  AssetsStackParamList,
+  T
+>;
+
+/**
+ * Type helper for work orders stack screens
+ */
+export type WorkOrdersStackScreenProps<T extends keyof WorkOrdersStackParamList> = NativeStackScreenProps<
+  WorkOrdersStackParamList,
+  T
 >;
 
 /**
