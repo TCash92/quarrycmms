@@ -15,10 +15,49 @@ module.exports = [
       '*.config.js',
       'dist/**',
       'build/**',
+      'coverage/**',
     ],
   },
+  // Test files - use separate tsconfig
+  {
+    files: ['**/__tests__/**/*.ts', '**/__tests__/**/*.tsx'],
+    languageOptions: {
+      parser: typescriptParser,
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        project: './tsconfig.test.json',
+      },
+    },
+    plugins: {
+      '@typescript-eslint': typescriptPlugin,
+      react: reactPlugin,
+      'react-hooks': reactHooksPlugin,
+      'react-native': reactNativePlugin,
+      prettier: prettierPlugin,
+    },
+    rules: {
+      'prettier/prettier': 'error',
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
+  },
+  // Non-test files - use main tsconfig
   {
     files: ['**/*.ts', '**/*.tsx'],
+    ignores: ['**/__tests__/**'],
     languageOptions: {
       parser: typescriptParser,
       parserOptions: {
