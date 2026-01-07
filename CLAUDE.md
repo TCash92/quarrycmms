@@ -4,163 +4,138 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-QuarryCMMS is a React Native (Expo) maintenance management app for Canadian aggregate operations. It prioritizes **offline-first operation** and **glove-friendly UI** for technicians working in harsh quarry conditions (-25°C winters, no cell signal, dusty environments).
+QuarryCMMS is an offline-first maintenance management system for Canadian aggregate/quarry operations. The design philosophy prioritizes capturing *imperfect* data instantly over capturing *perfect* data never—built for no cell signal, -25°C winters, gloved hands, and technicians who need to log work in 30 seconds.
 
-**Core philosophy:** Capture imperfect data instantly (Quick Log) over perfect data never. Supervisors enrich messy field data later.
-
-## Development Commands
+## Commands
 
 ```bash
-# Start development server
-npm start                    # Expo start (opens Metro)
-npx expo start --android     # Direct Android
-npx expo start --ios         # Direct iOS
+# Development
+npm start                 # Expo development server
+npm run android           # Run on Android
+npm run ios               # Run on iOS
 
-# Code quality
-npm run lint                 # ESLint check
-npm run lint:fix             # ESLint autofix
-npm run typecheck            # TypeScript check (strict mode enabled)
-npm run format               # Prettier format
-npm run format:check         # Prettier check
+# Code quality (run before committing)
+npm run lint              # ESLint check
+npm run lint:fix          # Auto-fix linting issues
+npm run typecheck         # TypeScript type check
+npm run format            # Prettier format
+npm run format:check      # Check formatting
 
-# Build (requires EAS CLI: npm install -g eas-cli)
-npm run build:dev            # Development build (internal distribution)
-npm run build:staging        # Staging build
-npm run build:prod           # Production build
+# Builds (EAS)
+npm run build:dev         # Development build
+npm run build:staging     # Staging build
+npm run build:prod        # Production build
 ```
 
 ## Architecture
 
 ### Tech Stack
 - **React Native 0.81** via Expo SDK 54
-- **WatermelonDB** for offline-first local database (SQLite with JSI)
+- **WatermelonDB** (SQLite with JSI) for offline-first local database
 - **Supabase** for backend (auth, database sync, storage)
 - **React Navigation** (native-stack + bottom-tabs)
 
-### Source Structure
+### Directory Structure
+
 ```
 src/
-├── app/              # Entry point exports (RootNavigator)
+├── screens/          # Screen components (LoginScreen, HomeScreen, etc.)
+├── navigation/       # React Navigation setup (RootNavigator → MainNavigator → stacks)
+├── database/         # WatermelonDB schema, migrations, and models
+├── services/
+│   ├── auth/         # Supabase authentication, session management
+│   ├── sync/         # Offline-first sync engine (pull/push, conflicts, retry queue)
+│   ├── photos/       # Photo upload/download with caching
+│   ├── voice-notes/  # Voice input for Quick Log
+│   ├── monitoring/   # Sentry, logging, telemetry
+│   └── recovery/     # Database health, reset, device migration
+├── hooks/            # Custom React hooks (useAuth, useSync, useWorkOrders, etc.)
 ├── components/       # Reusable UI components
-│   ├── ui/           # Base UI primitives
-│   ├── forms/        # Form components
-│   ├── sync/         # Sync status indicators
-│   └── settings/     # Settings-related components
-├── config/           # Environment configuration (reads from @env)
-├── constants/        # App-wide constants
-├── database/         # WatermelonDB setup
-│   ├── models/       # WatermelonDB model classes (Asset, WorkOrder, etc.)
-│   ├── schema.ts     # Database schema definition
-│   └── migrations.ts # Schema migrations
-├── hooks/            # Custom React hooks
-├── navigation/       # Navigation stacks
-│   ├── RootNavigator.tsx      # Auth-gated root
-│   ├── MainNavigator.tsx      # Bottom tabs
-│   └── *StackNavigator.tsx    # Feature stacks
-├── screens/          # Screen components
-├── services/         # Business logic
-│   ├── auth/         # Authentication (Supabase)
-│   ├── sync/         # Sync engine, conflict resolution, retry queue
-│   ├── photos/       # Photo capture/storage
-│   ├── voice-notes/  # Voice recording
-│   ├── signature/    # Cryptographic signatures for compliance
-│   ├── pdf/          # Offline PDF generation
-│   ├── recovery/     # Database health checks and reset
-│   └── monitoring/   # Sentry, logging, telemetry
-├── types/            # TypeScript interfaces
-└── utils/            # Utility functions
+├── config/           # Environment configuration and validation
+└── types/            # TypeScript interfaces
 ```
 
-### Key Patterns
+### Key Architectural Patterns
 
-**Path alias:** Use `@/` for `src/` imports (configured in tsconfig.json and babel.config.js):
-```typescript
-import { useAuth } from '@/hooks';
-import { WorkOrder } from '@/database';
+**Offline-First Sync**: All data operations happen locally first via WatermelonDB. The sync engine (`src/services/sync/`) handles:
+- Pull/push synchronization with Supabase
+- Field-level conflict resolution (last-write-wins with audit trail)
+- Retry queue with exponential backoff for failed operations
+- Photo sync handled separately from metadata
+
+**Quick Log + Enrichment**: Two-phase data capture:
+1. Technicians create "Quick Logs" with minimal data (voice notes, photos, 2-word descriptions)
+2. Supervisors "enrich" Quick Logs later with structured data via batch UI
+
+**Sync Status Tracking**: Every model has `local_sync_status` ('pending' | 'synced' | 'conflict'), `local_updated_at`, and `server_updated_at` fields for tracking synchronization state.
+
+### Database Schema (WatermelonDB)
+
+Four main tables in `src/database/schema.ts`:
+- **work_orders**: Maintenance requests with Quick Log support, voice notes, signatures
+- **assets**: Equipment inventory with meter tracking
+- **meter_readings**: Equipment telemetry
+- **work_order_photos**: Photo attachments with separate upload tracking
+
+### Navigation Structure
+
+```
+RootNavigator
+├── LoginScreen (unauthenticated)
+└── MainNavigator (authenticated)
+    └── Bottom Tab Navigator
+        ├── Home → HomeStackNavigator
+        ├── Assets → AssetsStackNavigator
+        ├── QuickLog → QuickLogScreen
+        └── Settings → SettingsStackNavigator
 ```
 
-**WatermelonDB models:** Use decorators and extend `Model`:
-```typescript
-import { Model } from '@nozbe/watermelondb';
-import { field, readonly, date } from '@nozbe/watermelondb/decorators';
+## TypeScript Configuration
 
-export default class WorkOrder extends Model {
-  static table = 'work_orders';
-  @field('title') title!: string;
-  @field('status') status!: string;
-}
-```
-
-**Sync status tracking:** All syncable records have `local_sync_status` field ('pending' | 'synced' | 'conflict').
-
-**Context providers hierarchy:** App.tsx wraps in order:
-1. `GestureHandlerRootView`
-2. `SafeAreaProvider`
-3. `DatabaseProvider` (WatermelonDB)
-4. `AuthProvider` (Supabase auth state)
-
-### Database Models
-
-| Table | Purpose |
-|-------|---------|
-| `work_orders` | Maintenance tasks, Quick Logs |
-| `assets` | Equipment being maintained |
-| `meter_readings` | Equipment meter readings |
-| `work_order_photos` | Photos attached to work orders |
-
-### Sync Architecture
-
-The sync engine (`src/services/sync/`) implements:
-- **Push/Pull sync** with Supabase
-- **Conflict resolution** (last-write-wins with audit trail)
-- **Exponential backoff** for retries
-- **Photo sync** (separate upload queue)
-- **Background sync** via Expo BackgroundFetch
-
-Conflict resolution prioritizes:
-1. `completed_at`, `signature_*` fields: Local wins (work completion is authoritative)
-2. `status` transitions: `completed > in_progress > open`
-3. Timestamps: Most recent wins
-4. Supervisor edits (enrichment): Server wins
+Strict mode is fully enabled with additional checks:
+- `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`
+- Path alias: `@/*` → `src/*`
+- Decorators enabled for WatermelonDB models
 
 ## Environment Configuration
 
 Copy `.env.example` to `.env.development` and configure:
-```bash
+```
 EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 EXPO_PUBLIC_SUPABASE_STORAGE_BUCKET=quarry-cmms
 ```
 
-Environment files: `.env.development`, `.env.staging`, `.env.production`
-Active env is symlinked: `.env -> .env.development`
+Configuration is validated on app startup in `App.tsx`. See `src/config/index.ts` for all options.
 
-## TypeScript Configuration
+## Design Constraints
 
-Strict mode is enabled with all strictness flags. Key settings:
-- `experimentalDecorators: true` (required for WatermelonDB)
-- `noUncheckedIndexedAccess: true` (array access returns `T | undefined`)
-- `exactOptionalPropertyTypes: true` (stricter optional handling)
+These are intentional design decisions, not bugs:
 
-## UI/UX Requirements
+1. **Large touch targets (48dp+)**: Users wear gloves in -25°C
+2. **No swipe gestures**: Unreliable with gloves
+3. **Voice-first input**: Typing is difficult in cold/dirty conditions
+4. **Offline PDF export**: Ministry inspectors need paper records without connectivity
+5. **Self-service recovery tools**: IT support is hours away from remote pits
 
-Per the design guide for quarry conditions:
-- **Large touch targets** (minimum 48x48pt, prefer 56pt)
-- **Glove-friendly**: No swipe gestures enabled (`gestureEnabled: false` in navigation)
-- **Voice-first input**: Voice notes as alternative to typing
-- **Quick Log**: Capture maintenance events in <30 seconds
-- **Offline indicators**: Always show sync status
+## Red Team Personas
 
-## Feature Flags
+Before making design changes, review `docs/PERSONAS.md`. These 8 personas stress-test decisions:
+- Dave (skeptical technician)
+- Sandra (risk-averse operations manager)
+- Robert (ministry inspector)
+- Michelle (burnt-out IT manager)
+- Gerald (cost-cutting CFO)
+- Alex (senior developer)
+- Ray (skeptical foreman)
+- Tanya (training coordinator)
 
-Configured via environment variables:
-- `EXPO_PUBLIC_ENABLE_VOICE_NOTES` - Voice recording feature
-- `EXPO_PUBLIC_ENABLE_OFFLINE_PDF` - Offline PDF generation
-- `EXPO_PUBLIC_ENABLE_ANALYTICS` - Analytics collection
-- `EXPO_PUBLIC_SHOW_SYNC_DEBUG` - Debug sync UI
+## Key Files for Common Tasks
 
-## User Roles
-
-- `technician`: Field workers, create Quick Logs, complete work orders
-- `supervisor`: Enrich Quick Logs, assign work, generate reports
-- `admin`: Full system access
+| Task | Key Files |
+|------|-----------|
+| Add new database table | `src/database/schema.ts`, `src/database/migrations.ts`, create model in `src/database/models/` |
+| Modify sync behavior | `src/services/sync/sync-engine.ts`, `src/services/sync/conflict-resolver.ts` |
+| Add new screen | Create in `src/screens/`, add to appropriate navigator in `src/navigation/` |
+| Add new hook | `src/hooks/`, export from `src/hooks/index.ts` |
+| Modify auth flow | `src/services/auth/AuthProvider.tsx`, `src/services/auth/auth-service.ts` |
