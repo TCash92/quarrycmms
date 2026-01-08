@@ -9,6 +9,7 @@ import React, {
 import NetInfo from '@react-native-community/netinfo';
 import { AuthState, AuthContextValue, LoginCredentials } from '@/types/auth';
 import { signIn, signOut, restoreSession, ensureValidToken } from './auth-service';
+import { useDatabaseReady } from '@/database';
 import {
   setUserContext,
   clearUserContext,
@@ -26,6 +27,8 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps): React.ReactElement {
   const [authState, setAuthState] = useState<AuthState>({ status: 'loading' });
   const [isOnline, setIsOnline] = useState(true);
+  const [sessionRestored, setSessionRestored] = useState(false);
+  const dbReady = useDatabaseReady();
 
   // Monitor network connectivity
   useEffect(() => {
@@ -54,14 +57,8 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
           // Set monitoring user context
           setUserContext(restored.user.id, restored.user.siteId);
           logger.info('Session restored', { category: 'auth', userId: restored.user.id });
-
-          // Trigger sync after session restore (non-blocking)
-          performSync().catch(err => {
-            logger.warn('Sync after session restore failed', {
-              category: 'sync',
-              error: err instanceof Error ? err.message : String(err),
-            });
-          });
+          // Mark session as restored - sync will be triggered by separate effect
+          setSessionRestored(true);
         } else {
           logger.info('No session found, setting unauthenticated', { category: 'auth' });
           setAuthState({ status: 'unauthenticated' });
@@ -74,6 +71,19 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
 
     void initialize();
   }, []);
+
+  // Trigger sync only when database is ready AND session is restored
+  // This prevents race conditions on slow devices where DB may not be initialized
+  useEffect(() => {
+    if (dbReady && sessionRestored && authState.status === 'authenticated') {
+      performSync().catch(err => {
+        logger.warn('Sync after session restore failed', {
+          category: 'sync',
+          error: err instanceof Error ? err.message : String(err),
+        });
+      });
+    }
+  }, [dbReady, sessionRestored, authState.status]);
 
   const login = useCallback(
     async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {

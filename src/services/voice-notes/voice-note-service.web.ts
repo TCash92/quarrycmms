@@ -62,6 +62,7 @@ class VoiceNoteServiceWeb {
   private audioElement: HTMLAudioElement | null = null;
   private recordingStartTime: number = 0;
   private playbackStatusCallback: ((status: PlaybackStatus) => void) | null = null;
+  private playbackListeners: Array<{ event: string; handler: () => void }> = [];
 
   /**
    * Request microphone permission
@@ -227,9 +228,18 @@ class VoiceNoteServiceWeb {
    * Load audio file for playback
    */
   async loadAudio(uri: string): Promise<void> {
-    // Unload existing audio
+    // Properly cleanup existing audio to prevent memory leaks
     if (this.audioElement) {
+      // Remove event listeners first
+      this.removePlaybackListeners();
+
       this.audioElement.pause();
+
+      // Revoke blob URL if present to free memory
+      if (this.audioElement.src.startsWith('blob:')) {
+        URL.revokeObjectURL(this.audioElement.src);
+      }
+
       this.audioElement.src = '';
       this.audioElement = null;
     }
@@ -253,10 +263,25 @@ class VoiceNoteServiceWeb {
   }
 
   /**
+   * Remove playback event listeners to prevent memory leaks
+   */
+  private removePlaybackListeners(): void {
+    if (this.audioElement && this.playbackListeners.length > 0) {
+      this.playbackListeners.forEach(({ event, handler }) => {
+        this.audioElement?.removeEventListener(event, handler);
+      });
+    }
+    this.playbackListeners = [];
+  }
+
+  /**
    * Set up event listeners for playback status updates
    */
   private setupPlaybackListeners(): void {
     if (!this.audioElement) return;
+
+    // Remove existing listeners first to prevent memory leaks
+    this.removePlaybackListeners();
 
     const updateStatus = (): void => {
       if (this.playbackStatusCallback && this.audioElement) {
@@ -269,11 +294,12 @@ class VoiceNoteServiceWeb {
       }
     };
 
-    this.audioElement.addEventListener('timeupdate', updateStatus);
-    this.audioElement.addEventListener('play', updateStatus);
-    this.audioElement.addEventListener('pause', updateStatus);
-    this.audioElement.addEventListener('ended', updateStatus);
-    this.audioElement.addEventListener('ratechange', updateStatus);
+    // Track all listeners for proper cleanup
+    const events = ['timeupdate', 'play', 'pause', 'ended', 'ratechange'] as const;
+    this.playbackListeners = events.map(event => {
+      this.audioElement!.addEventListener(event, updateStatus);
+      return { event, handler: updateStatus };
+    });
   }
 
   /**
@@ -356,6 +382,9 @@ class VoiceNoteServiceWeb {
     await this.cancelRecording();
 
     if (this.audioElement) {
+      // Remove event listeners first to prevent memory leaks
+      this.removePlaybackListeners();
+
       this.audioElement.pause();
       // Revoke blob URL if it's a blob
       if (this.audioElement.src.startsWith('blob:')) {
