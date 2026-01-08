@@ -6,9 +6,10 @@
  */
 
 import * as FileSystem from 'expo-file-system';
+import { documentDirectory, EncodingType } from 'expo-file-system/legacy';
 
 /** Base directory for cached photos */
-export const PHOTOS_DIRECTORY = `${FileSystem.documentDirectory}photos/`;
+export const PHOTOS_DIRECTORY = `${documentDirectory}photos/`;
 
 /** Retention period for uploaded photos (30 days in ms) */
 export const PHOTO_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
@@ -97,7 +98,7 @@ export async function getPhotoInfo(
 ): Promise<FileSystem.FileInfo | null> {
   try {
     const path = getPhotoPath(photoId);
-    const info = await FileSystem.getInfoAsync(path, { size: true });
+    const info = await FileSystem.getInfoAsync(path);
     return info.exists ? info : null;
   } catch (error) {
     console.error(`[PhotoCache] Failed to get info for photo ${photoId}:`, error);
@@ -120,7 +121,7 @@ export async function readPhotoAsBase64(photoId: string): Promise<string | null>
     }
 
     const base64 = await FileSystem.readAsStringAsync(path, {
-      encoding: FileSystem.EncodingType.Base64,
+      encoding: EncodingType.Base64,
     });
 
     return base64;
@@ -143,9 +144,9 @@ export async function getCacheSize(): Promise<number> {
 
     for (const file of files) {
       const path = `${PHOTOS_DIRECTORY}${file}`;
-      const info = await FileSystem.getInfoAsync(path, { size: true });
-      if (info.exists && 'size' in info) {
-        totalSize += info.size || 0;
+      const info = await FileSystem.getInfoAsync(path);
+      if (info.exists && info.size) {
+        totalSize += info.size;
       }
     }
 

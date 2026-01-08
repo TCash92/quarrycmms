@@ -25,11 +25,11 @@ interface MeterReadingInputProps {
   /** Meter type label (e.g., "Hours", "Miles") */
   meterType: string;
   /** Meter unit label (e.g., "hrs", "mi") */
-  meterUnit?: string;
+  meterUnit?: string | undefined;
   /** Callback when a new reading is saved */
-  onSave?: (value: number) => void;
+  onSave?: ((value: number) => void) | undefined;
   /** Callback with validation result on value change */
-  onValidation?: (result: MeterValidationResult) => void;
+  onValidation?: ((result: MeterValidationResult) => void) | undefined;
 }
 
 /**

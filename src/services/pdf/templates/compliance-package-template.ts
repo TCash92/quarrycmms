@@ -23,12 +23,9 @@ import {
   formatTime,
   formatDuration,
   formatTimestamp,
-  getTruncatedHash,
 } from '../utils/image-utils';
 import {
   type CompliancePackageData,
-  type AssetDowntimeStats,
-  type AuditSummary,
   calculateAssetDowntime,
   calculateAllAssetDowntime,
   calculateAuditSummary,
@@ -174,7 +171,7 @@ function generateEquipmentCard(
   workOrders: WorkOrder[],
   meterReadings: MeterReading[]
 ): string {
-  const statusConfig = STATUS_CONFIG[asset.status] || STATUS_CONFIG.operational;
+  const statusConfig = STATUS_CONFIG[asset.status] ?? { label: 'Operational', class: 'badge-operational' };
   const woCount = countAssetWorkOrders(asset.id, workOrders);
   const latestMeter = getLatestMeterReading(asset.id, meterReadings);
   const downtime = calculateAssetDowntime(asset.id, workOrders);
@@ -268,8 +265,8 @@ function generateWorkOrderCard(
   workOrder: WorkOrder,
   asset: Asset | undefined
 ): string {
-  const statusConfig = WO_STATUS_CONFIG[workOrder.status] || WO_STATUS_CONFIG.open;
-  const priorityConfig = PRIORITY_CONFIG[workOrder.priority] || PRIORITY_CONFIG.medium;
+  const statusConfig = WO_STATUS_CONFIG[workOrder.status] ?? { label: 'Open', class: 'badge-open' };
+  const priorityConfig = PRIORITY_CONFIG[workOrder.priority] ?? { label: 'Medium', class: 'badge-medium' };
 
   return `
     <div class="wo-card">

@@ -77,7 +77,7 @@ export interface UsePdfReturn {
  */
 export function usePdf(): UsePdfReturn {
   const database = useDatabase();
-  const { user } = useAuth();
+  const { authState } = useAuth();
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastResult, setLastResult] = useState<PdfResult | null>(null);
@@ -224,7 +224,7 @@ export function usePdf(): UsePdfReturn {
           assets,
           workOrders,
           meterReadings,
-          generatedBy: user?.email || 'Unknown User',
+          generatedBy: (authState.status === 'authenticated' ? authState.user.email : null) || 'Unknown User',
           generatedAt: new Date(),
         };
 
@@ -248,7 +248,7 @@ export function usePdf(): UsePdfReturn {
         setIsGenerating(false);
       }
     },
-    [database, user]
+    [database, authState]
   );
 
   return {

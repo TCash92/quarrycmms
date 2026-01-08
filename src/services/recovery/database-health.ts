@@ -7,7 +7,6 @@
  * @module services/recovery/database-health
  */
 
-import { Q } from '@nozbe/watermelondb';
 import { database } from '@/database';
 import { schema } from '@/database/schema';
 import { logger } from '@/services/monitoring';

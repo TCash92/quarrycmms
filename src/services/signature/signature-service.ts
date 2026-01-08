@@ -133,7 +133,10 @@ export function generateVerificationCode(hash: string): string {
   // Generate 12 characters
   for (let i = 0; i < 12; i++) {
     const index = Number(value % BigInt(VERIFICATION_CHARSET.length));
-    chars.unshift(VERIFICATION_CHARSET[index]);
+    const char = VERIFICATION_CHARSET[index];
+    if (char !== undefined) {
+      chars.unshift(char);
+    }
     value = value / BigInt(VERIFICATION_CHARSET.length);
   }
 

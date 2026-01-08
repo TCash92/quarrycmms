@@ -45,7 +45,7 @@ const PRIORITY_LABELS: Record<string, string> = {
  * Generate HTML for the asset header section
  */
 function generateHeader(asset: Asset): string {
-  const statusConfig = STATUS_CONFIG[asset.status] || STATUS_CONFIG.operational;
+  const statusConfig = STATUS_CONFIG[asset.status] ?? { label: 'Operational', class: 'badge-operational' };
 
   return `
     <div class="header">
@@ -113,9 +113,12 @@ function generateMeterReadingsSection(
     (a, b) => b.readingDate - a.readingDate
   );
 
-  // Calculate statistics
+  // Calculate statistics (guaranteed to exist since we check length above)
   const latestReading = sortedReadings[0];
   const oldestReading = sortedReadings[sortedReadings.length - 1];
+  if (!latestReading || !oldestReading) {
+    return '';
+  }
   const totalUsage = latestReading.readingValue - oldestReading.readingValue;
   const daysSpan = Math.ceil(
     (latestReading.readingDate - oldestReading.readingDate) / (1000 * 60 * 60 * 24)
@@ -246,7 +249,7 @@ function generateWorkOrderHistorySection(workOrders: WorkOrder[]): string {
         </thead>
         <tbody>
           ${sortedOrders.slice(0, 25).map(wo => {
-            const statusConfig = WO_STATUS_CONFIG[wo.status] || WO_STATUS_CONFIG.open;
+            const statusConfig = WO_STATUS_CONFIG[wo.status] ?? { label: 'Open', class: 'badge-open' };
             return `
               <tr>
                 <td><strong>${wo.woNumber}</strong></td>

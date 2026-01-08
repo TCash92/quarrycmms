@@ -18,7 +18,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { usePdf } from '@/hooks';
-import { Button } from '@/components/ui';
 import { TOUCH_TARGETS } from '@/constants';
 
 /**

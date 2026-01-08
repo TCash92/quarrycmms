@@ -8,6 +8,7 @@
  */
 
 import * as FileSystem from 'expo-file-system';
+import { EncodingType } from 'expo-file-system/legacy';
 import { sha256 } from '@/services/signature';
 
 /**
@@ -19,7 +20,7 @@ import { sha256 } from '@/services/signature';
 export async function fileToBase64(uri: string): Promise<string> {
   try {
     const base64 = await FileSystem.readAsStringAsync(uri, {
-      encoding: FileSystem.EncodingType.Base64,
+      encoding: EncodingType.Base64,
     });
     // Detect image type from extension or default to png
     const extension = uri.toLowerCase().split('.').pop() || 'png';

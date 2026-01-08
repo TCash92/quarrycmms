@@ -295,7 +295,7 @@ export function getLatestMeterReading(
     .filter(mr => mr.assetId === assetId)
     .sort((a, b) => (b.readingDate || 0) - (a.readingDate || 0));
 
-  return assetReadings.length > 0 ? assetReadings[0].readingValue : null;
+  return assetReadings.length > 0 ? (assetReadings[0]?.readingValue ?? null) : null;
 }
 
 /**

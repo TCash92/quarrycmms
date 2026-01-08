@@ -125,7 +125,7 @@ export function useMeterReadings(assetId: string | null): UseMeterReadingsReturn
         .fetch();
 
       setReadingHistory(readings);
-      setLatestReading(readings.length > 0 ? readings[0] : null);
+      setLatestReading(readings.length > 0 ? (readings[0] ?? null) : null);
     } catch (err) {
       console.error('[useMeterReadings] Failed to load readings:', err);
       setError('Failed to load meter readings');
@@ -196,7 +196,8 @@ export function useMeterReadings(assetId: string | null): UseMeterReadingsReturn
       // Validate before creating
       const validation = validateReading(data.value);
       if (!validation.isValid) {
-        throw new Error(validation.errors[0].message);
+        const firstError = validation.errors[0];
+        throw new Error(firstError?.message ?? 'Validation failed');
       }
 
       setIsSubmitting(true);

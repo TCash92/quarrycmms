@@ -26,7 +26,7 @@ export interface ClassifiedError {
   /** Original error object or message */
   originalError: Error | string;
   /** HTTP status code if available */
-  httpStatus?: number;
+  httpStatus?: number | undefined;
   /** Whether this error should be retried */
   shouldRetry: boolean;
   /** Maximum retry attempts for this error type */
@@ -89,9 +89,10 @@ export function extractHttpStatus(error: unknown): number | undefined {
     // Code property (Supabase PostgREST)
     if (typeof err.code === 'string') {
       const codeMatch = err.code.match(/^PGRST(\d+)$/);
-      if (codeMatch) {
+      const codeDigits = codeMatch?.[1];
+      if (codeDigits) {
         // PostgREST error codes map to HTTP statuses
-        const pgrstCode = parseInt(codeMatch[1], 10);
+        const pgrstCode = parseInt(codeDigits, 10);
         if (pgrstCode >= 300 && pgrstCode < 600) {
           return pgrstCode;
         }

@@ -12,7 +12,7 @@ import {
   schedulePeriodicTelemetry,
   stopPeriodicTelemetry,
 } from '@/services/monitoring';
-import { checkDatabaseHealth, DatabaseHealthReport } from '@/services/recovery';
+import { checkDatabaseHealth } from '@/services/recovery';
 
 /**
  * Application entry point
@@ -21,7 +21,6 @@ import { checkDatabaseHealth, DatabaseHealthReport } from '@/services/recovery';
 export default function App(): React.ReactElement {
   const [configError, setConfigError] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
-  const [dbHealthReport, setDbHealthReport] = useState<DatabaseHealthReport | null>(null);
 
   useEffect(() => {
     const initializeApp = async (): Promise<void> => {
@@ -40,7 +39,6 @@ export default function App(): React.ReactElement {
         // Run database health check
         try {
           const healthReport = await checkDatabaseHealth();
-          setDbHealthReport(healthReport);
 
           if (!healthReport.healthy) {
             logger.warn('Database health issues detected', {

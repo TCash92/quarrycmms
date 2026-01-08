@@ -110,7 +110,7 @@ export function useVoiceNote(): UseVoiceNoteReturn {
   const [error, setError] = useState<string | null>(null);
 
   // Timer ref for recording updates
-  const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Check permission on mount
   useEffect(() => {

@@ -10,6 +10,7 @@
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system';
+import { documentDirectory } from 'expo-file-system/legacy';
 import type WorkOrder from '@/database/models/WorkOrder';
 import type Asset from '@/database/models/Asset';
 import type MeterReading from '@/database/models/MeterReading';
@@ -82,7 +83,7 @@ export async function generateWorkOrderPdf(
 
     // Move to a better location with proper filename
     const fileName = `WO-${workOrder.woNumber}-${Date.now()}.pdf`;
-    const newUri = `${FileSystem.documentDirectory}${fileName}`;
+    const newUri = `${documentDirectory}${fileName}`;
 
     await FileSystem.moveAsync({
       from: uri,
@@ -133,7 +134,7 @@ export async function generateAssetHistoryPdf(
 
     // Move to a better location with proper filename
     const fileName = `Asset-${asset.assetNumber}-History-${Date.now()}.pdf`;
-    const newUri = `${FileSystem.documentDirectory}${fileName}`;
+    const newUri = `${documentDirectory}${fileName}`;
 
     await FileSystem.moveAsync({
       from: uri,
@@ -219,7 +220,7 @@ export async function generateCompliancePackagePdf(
 
     // Move to a better location with proper filename
     const fileName = `Compliance-${data.siteName.replace(/\s+/g, '-')}-${startDate}-to-${endDate}.pdf`;
-    const newUri = `${FileSystem.documentDirectory}${fileName}`;
+    const newUri = `${documentDirectory}${fileName}`;
 
     await FileSystem.moveAsync({
       from: uri,
@@ -255,7 +256,7 @@ export async function cleanupOldPdfs(maxAgeMs = 7 * 24 * 60 * 60 * 1000): Promis
   logger.debug('Cleaning up old PDFs', { category: 'pdf', maxAgeDays: maxAgeMs / (24 * 60 * 60 * 1000) });
 
   try {
-    const docDir = FileSystem.documentDirectory;
+    const docDir = documentDirectory;
     if (!docDir) return;
 
     const files = await FileSystem.readDirectoryAsync(docDir);

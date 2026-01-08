@@ -31,7 +31,6 @@ import {
   Timer,
   SignaturePad,
   TextInput,
-  Button,
   VoiceNoteRecorder,
   VoiceNotePlayer,
 } from '@/components/ui';
@@ -533,7 +532,7 @@ export function WorkOrderDetailScreen(): React.ReactElement {
 
         {/* Dates */}
         <Section title="Dates">
-          <InfoRow label="Created" value={formatDateTime(workOrder.createdAt)} />
+          <InfoRow label="Created" value={formatDateTime(workOrder.localUpdatedAt)} />
           <InfoRow label="Due" value={formatDateTime(workOrder.dueDate)} />
           {workOrder.startedAt && (
             <InfoRow label="Started" value={formatDateTime(workOrder.startedAt)} />

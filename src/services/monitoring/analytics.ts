@@ -55,7 +55,7 @@ export function trackEvent(name: string, properties?: Record<string, unknown>): 
     category: 'analytics',
     message: name,
     level: 'info',
-    data: properties,
+    ...(properties && { data: properties }),
   });
 }
 
@@ -217,7 +217,7 @@ export function trackError(errorType: string, context?: Record<string, unknown>)
     category: 'error',
     message: errorType,
     level: 'error',
-    data: context,
+    ...(context && { data: context }),
   });
 }
 

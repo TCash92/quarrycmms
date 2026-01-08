@@ -9,6 +9,7 @@
 
 import * as Device from 'expo-device';
 import * as FileSystem from 'expo-file-system';
+import { documentDirectory } from 'expo-file-system/legacy';
 import Constants from 'expo-constants';
 import * as Sentry from '@sentry/react-native';
 import { logger } from './logger';
@@ -117,7 +118,7 @@ function getAppVersion(): string {
  */
 async function getStorageInfo(): Promise<{ usedMb: number; availableMb: number }> {
   try {
-    const docDir = FileSystem.documentDirectory;
+    const docDir = documentDirectory;
     if (!docDir) {
       return { usedMb: 0, availableMb: 0 };
     }

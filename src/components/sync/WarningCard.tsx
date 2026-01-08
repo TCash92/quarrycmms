@@ -30,9 +30,9 @@ export interface WarningCardProps {
   /** User-friendly message explaining the warning */
   message: string;
   /** Optional action buttons */
-  actions?: WarningAction[];
+  actions?: WarningAction[] | undefined;
   /** Test ID for e2e testing */
-  testID?: string;
+  testID?: string | undefined;
 }
 
 /**

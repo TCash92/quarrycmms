@@ -14,8 +14,6 @@ import {
   formatDate,
   formatTime,
   formatDuration,
-  formatTimestamp,
-  getTruncatedHash,
 } from '../utils/image-utils';
 
 /**
@@ -60,9 +58,9 @@ export interface SignatureData {
   /** Name of person who signed */
   signedBy: string;
   /** Verification code (XXXX-XXXX-XXXX format) */
-  verificationCode?: string;
+  verificationCode?: string | undefined;
   /** Base64-encoded QR code image for verification URL */
-  qrCodeBase64?: string;
+  qrCodeBase64?: string | undefined;
   /** Canonical fields used in hash calculation */
   canonicalFields?: {
     wo_number: string;
@@ -80,8 +78,8 @@ export interface SignatureData {
  * Generate HTML for the work order header section
  */
 function generateHeader(workOrder: WorkOrder): string {
-  const priorityConfig = PRIORITY_CONFIG[workOrder.priority] || PRIORITY_CONFIG.medium;
-  const statusConfig = STATUS_CONFIG[workOrder.status] || STATUS_CONFIG.open;
+  const priorityConfig = PRIORITY_CONFIG[workOrder.priority] ?? { label: 'Medium', class: 'badge-medium' };
+  const statusConfig = STATUS_CONFIG[workOrder.status] ?? { label: 'Open', class: 'badge-open' };
 
   return `
     <div class="header">
@@ -334,7 +332,6 @@ function generateVerificationSection(signature: SignatureData): string {
  * Generate HTML for the footer
  */
 function generateFooter(): string {
-  const generatedAt = new Date().toISOString();
   return `
     <div class="footer">
       <div>Generated: ${formatDate(Date.now())} ${formatTime(Date.now())}</div>
@@ -347,7 +344,6 @@ function generateFooter(): string {
  * Escape HTML special characters
  */
 function escapeHtml(text: string): string {
-  const div = { innerHTML: '' };
   return text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')

@@ -32,7 +32,7 @@ import {
   ActionTypePicker,
   RecentAssetsList,
 } from '@/components/ui';
-import { TOUCH_TARGETS, QuickLogActionType } from '@/constants';
+import { QuickLogActionType } from '@/constants';
 
 /**
  * Section header component

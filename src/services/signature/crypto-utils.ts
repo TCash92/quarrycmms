@@ -82,7 +82,10 @@ export function bytesToBase64(bytes: Uint8Array): string {
   // Create binary string from bytes
   let binary = '';
   for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
+    const byte = bytes[i];
+    if (byte !== undefined) {
+      binary += String.fromCharCode(byte);
+    }
   }
   // Use btoa for base64 encoding
   return btoa(binary);
