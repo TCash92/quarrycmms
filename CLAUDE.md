@@ -27,6 +27,51 @@ npm run build:staging     # Staging build
 npm run build:prod        # Production build
 ```
 
+## Testing
+
+```bash
+npm test              # Run all tests
+npm run test:watch    # Watch mode
+npm run test:coverage # Coverage report
+```
+
+### Test Structure
+- Tests live in `src/__tests__/` mirroring source structure
+- Mocks in `src/__tests__/mocks/` (WatermelonDB, Supabase, NetInfo)
+- Helpers in `src/__tests__/helpers/`
+
+### Coverage Targets
+
+| Module | Target | Rationale |
+|--------|--------|-----------|
+| `services/sync/` | 60%+ (enforced) | Safety-critical offline sync |
+| `services/auth/` | 80%+ | Security-critical |
+| `hooks/` | 70%+ | Shared logic |
+
+### TDD Approach
+1. Write failing tests FIRST
+2. Implement code to pass tests
+3. NEVER modify tests to match buggy implementation
+
+## Git Workflow
+
+### Branch Naming
+- `feat/xxx` — New features
+- `fix/xxx` — Bug fixes
+- `docs/xxx` — Documentation only
+
+### Commit Messages
+Use conventional commits format:
+- `feat: add voice note transcription`
+- `fix: resolve sync conflict in offline mode`
+- `docs: update CLAUDE.md with testing section`
+
+### Pre-commit Checks
+Husky runs automatically on commit:
+1. TypeScript type check (`npm run typecheck`)
+2. ESLint + Prettier on staged files
+3. Jest tests for related files
+
 ## Architecture
 
 ### Tech Stack
@@ -117,6 +162,19 @@ These are intentional design decisions, not bugs:
 3. **Voice-first input**: Typing is difficult in cold/dirty conditions
 4. **Offline PDF export**: Ministry inspectors need paper records without connectivity
 5. **Self-service recovery tools**: IT support is hours away from remote pits
+
+## DO NOT
+
+These rules prevent common mistakes:
+
+- **NEVER** use `any` type in TypeScript (strict mode enforced)
+- **NEVER** commit without running `npm run lint && npm run typecheck`
+- **NEVER** make swipe gestures (unreliable with gloves)
+- **NEVER** hardcode Supabase credentials in code
+- **NEVER** remove `local_sync_status` tracking fields from models
+- **NEVER** delete or modify existing tests to make them pass
+- **NEVER** ignore WatermelonDB sync conflicts silently
+- **NEVER** skip the Red Team persona review for UX changes
 
 ## Red Team Personas
 
