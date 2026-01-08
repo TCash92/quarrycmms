@@ -1,3 +1,2 @@
-// Utility functions - implemented in later PRs
-// Will contain: crypto.ts, date.ts, validation.ts
-export {};
+// Utility functions
+export { showAlert, showConfirm } from './alert';

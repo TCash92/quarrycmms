@@ -6,6 +6,8 @@ import type { WorkOrderPriority } from '@/database/models/WorkOrder';
 interface PriorityPickerProps {
   value: WorkOrderPriority;
   onChange: (priority: WorkOrderPriority) => void;
+  /** testID for E2E testing - chips get suffixed with priority level */
+  testID?: string;
 }
 
 const PRIORITIES: WorkOrderPriority[] = ['low', 'medium', 'high', 'emergency'];
@@ -14,7 +16,11 @@ const PRIORITIES: WorkOrderPriority[] = ['low', 'medium', 'high', 'emergency'];
  * Priority selection component for forms
  * Displays priority options as tappable chips
  */
-export function PriorityPicker({ value, onChange }: PriorityPickerProps): React.ReactElement {
+export function PriorityPicker({
+  value,
+  onChange,
+  testID,
+}: PriorityPickerProps): React.ReactElement {
   return (
     <View style={styles.container}>
       {PRIORITIES.map(priority => {
@@ -29,6 +35,7 @@ export function PriorityPicker({ value, onChange }: PriorityPickerProps): React.
             accessibilityRole="radio"
             accessibilityState={{ selected: isSelected }}
             accessibilityLabel={`${config.label} priority`}
+            testID={testID ? `${testID}-${priority}` : undefined}
           >
             <Text
               style={[

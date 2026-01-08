@@ -365,12 +365,17 @@ export function WorkOrderDetailScreen(): React.ReactElement {
                 onPause={timer.pause}
                 onResume={timer.resume}
                 onManualSet={timer.setManualMinutes}
+                testID="wo-detail-timer"
               />
             </Section>
 
             {/* Failure Type */}
             <Section title="Failure Type">
-              <FailureTypePicker value={failureType} onChange={setFailureType} />
+              <FailureTypePicker
+                value={failureType}
+                onChange={setFailureType}
+                testID="wo-detail-failure-type"
+              />
             </Section>
 
             {/* Completion Notes */}
@@ -382,6 +387,7 @@ export function WorkOrderDetailScreen(): React.ReactElement {
                 multiline
                 numberOfLines={4}
                 inputStyle={styles.textArea}
+                testID="wo-detail-completion-notes"
               />
             </Section>
 
@@ -409,7 +415,7 @@ export function WorkOrderDetailScreen(): React.ReactElement {
             {/* Signature */}
             <Section title="Signature">
               {signatureData ? (
-                <View style={styles.signaturePreview}>
+                <View style={styles.signaturePreview} testID="wo-detail-signature-captured">
                   <Text style={styles.signatureCaptured}>Signature Captured</Text>
                   <TouchableOpacity
                     style={styles.resignButton}
@@ -425,6 +431,7 @@ export function WorkOrderDetailScreen(): React.ReactElement {
                 <TouchableOpacity
                   style={styles.signatureButton}
                   onPress={() => setShowSignaturePad(true)}
+                  testID="wo-detail-signature-button"
                 >
                   <Text style={styles.signatureButtonText}>Tap to Sign</Text>
                 </TouchableOpacity>
@@ -450,6 +457,9 @@ export function WorkOrderDetailScreen(): React.ReactElement {
               ]}
               onPress={handleSubmitCompletion}
               disabled={!signatureData || isSubmitting}
+              testID="wo-detail-submit-completion"
+              accessibilityRole="button"
+              accessibilityLabel="Complete and sign off work order"
             >
               <Text style={styles.submitButtonText}>
                 {isSubmitting ? 'Submitting...' : 'Complete & Sign Off'}
@@ -495,8 +505,16 @@ export function WorkOrderDetailScreen(): React.ReactElement {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerRow}>
-            <WorkOrderStatusBadge status={workOrder.status} size="medium" />
-            <PriorityBadge priority={workOrder.priority} size="medium" />
+            <WorkOrderStatusBadge
+              status={workOrder.status}
+              size="medium"
+              testID="wo-detail-status"
+            />
+            <PriorityBadge
+              priority={workOrder.priority}
+              size="medium"
+              testID="wo-detail-priority"
+            />
           </View>
           <Text style={styles.woTitle}>{workOrder.title}</Text>
           {workOrder.isOverdue && (
@@ -519,6 +537,7 @@ export function WorkOrderDetailScreen(): React.ReactElement {
               onPause={timer.pause}
               onResume={timer.resume}
               onManualSet={timer.setManualMinutes}
+              testID="wo-detail-timer"
             />
           </Section>
         )}
@@ -569,7 +588,9 @@ export function WorkOrderDetailScreen(): React.ReactElement {
             {workOrder.verificationCode && (
               <View style={styles.verificationRow}>
                 <Text style={styles.infoLabel}>Verification Code</Text>
-                <Text style={styles.verificationCode}>{workOrder.verificationCode}</Text>
+                <Text style={styles.verificationCode} testID="wo-detail-verification-code">
+                  {workOrder.verificationCode}
+                </Text>
               </View>
             )}
           </Section>
@@ -580,12 +601,20 @@ export function WorkOrderDetailScreen(): React.ReactElement {
       {workOrder.status !== 'completed' && (
         <View style={styles.buttonContainer}>
           {workOrder.status === 'open' && (
-            <TouchableOpacity style={styles.startButton} onPress={handleStartWorkOrder}>
+            <TouchableOpacity
+              style={styles.startButton}
+              onPress={handleStartWorkOrder}
+              testID="wo-detail-start-button"
+            >
               <Text style={styles.startButtonText}>Start Work Order</Text>
             </TouchableOpacity>
           )}
           {workOrder.status === 'in_progress' && (
-            <TouchableOpacity style={styles.completeButton} onPress={handleCompleteWorkOrder}>
+            <TouchableOpacity
+              style={styles.completeButton}
+              onPress={handleCompleteWorkOrder}
+              testID="wo-detail-complete-button"
+            >
               <Text style={styles.completeButtonText}>Complete Work Order</Text>
             </TouchableOpacity>
           )}

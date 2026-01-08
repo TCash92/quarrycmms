@@ -12,13 +12,20 @@ interface FilterChipsProps {
   chips: FilterChip[];
   selected: string;
   onSelect: (key: string) => void;
+  /** Base testID for E2E testing - chips get suffixes like -all, -open, etc. */
+  testID?: string;
 }
 
 /**
  * Horizontal scrolling filter chips
  * For filtering lists by status, category, etc.
  */
-export function FilterChips({ chips, selected, onSelect }: FilterChipsProps): React.ReactElement {
+export function FilterChips({
+  chips,
+  selected,
+  onSelect,
+  testID,
+}: FilterChipsProps): React.ReactElement {
   return (
     <ScrollView
       horizontal
@@ -40,6 +47,7 @@ export function FilterChips({ chips, selected, onSelect }: FilterChipsProps): Re
             accessibilityRole="tab"
             accessibilityState={{ selected: isSelected }}
             accessibilityLabel={`Filter by ${chip.label}`}
+            testID={testID ? `${testID}-${chip.key.replace('_', '-')}` : undefined}
           >
             <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>
               {chip.label}

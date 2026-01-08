@@ -10,6 +10,8 @@ interface AssetPickerProps {
   value: string | null;
   onChange: (assetId: string) => void;
   placeholder?: string;
+  /** testID for E2E testing */
+  testID?: string;
 }
 
 /**
@@ -20,6 +22,7 @@ export function AssetPicker({
   value,
   onChange,
   placeholder = 'Select asset...',
+  testID,
 }: AssetPickerProps): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
@@ -84,6 +87,7 @@ export function AssetPicker({
         onPress={handleOpen}
         accessibilityRole="button"
         accessibilityLabel={selectedAsset ? `Selected: ${selectedAsset.assetNumber}` : placeholder}
+        testID={testID}
       >
         {selectedAsset ? (
           <View style={styles.selectedValue}>

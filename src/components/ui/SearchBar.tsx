@@ -7,6 +7,8 @@ interface SearchBarProps {
   onChangeText: (text: string) => void;
   placeholder?: string;
   onClear?: () => void;
+  /** testID for E2E testing */
+  testID?: string;
 }
 
 /**
@@ -18,6 +20,7 @@ export function SearchBar({
   onChangeText,
   placeholder = 'Search...',
   onClear,
+  testID,
 }: SearchBarProps): React.ReactElement {
   const handleClear = () => {
     onChangeText('');
@@ -38,6 +41,7 @@ export function SearchBar({
         returnKeyType="search"
         accessibilityLabel={placeholder}
         accessibilityRole="search"
+        testID={testID}
       />
       {value.length > 0 && (
         <TouchableOpacity

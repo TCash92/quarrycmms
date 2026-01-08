@@ -63,7 +63,7 @@ export function LoginScreen(): React.ReactElement {
         >
           {/* Offline Banner */}
           {!isOnline && (
-            <View style={styles.offlineBanner}>
+            <View style={styles.offlineBanner} testID="login-offline-banner">
               <Text style={styles.offlineBannerText}>
                 You are offline. Login requires an internet connection.
               </Text>
@@ -88,6 +88,7 @@ export function LoginScreen(): React.ReactElement {
               autoCorrect={false}
               autoComplete="email"
               editable={!isLoading}
+              testID="login-email-input"
             />
 
             <TextInput
@@ -100,11 +101,12 @@ export function LoginScreen(): React.ReactElement {
               autoCorrect={false}
               autoComplete="password"
               editable={!isLoading}
+              testID="login-password-input"
             />
 
             {/* Error Message */}
             {error && (
-              <View style={styles.errorContainer}>
+              <View style={styles.errorContainer} testID="login-error-message">
                 <Text style={styles.errorText}>{error}</Text>
               </View>
             )}
@@ -116,6 +118,7 @@ export function LoginScreen(): React.ReactElement {
                 onPress={handleLogin}
                 loading={isLoading}
                 disabled={!isOnline || isLoading}
+                testID="login-submit-button"
               />
             </View>
           </View>

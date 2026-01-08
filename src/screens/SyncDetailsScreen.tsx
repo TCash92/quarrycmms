@@ -357,7 +357,7 @@ export function SyncDetailsScreen(_props: Props): React.ReactElement {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         {/* Status Summary */}
-        <View style={styles.statusSummary}>
+        <View style={styles.statusSummary} testID="sync-details-status">
           <Text style={styles.statusLabel}>
             Last sync: {formatRelativeTime(syncStatus.lastSyncAt)}
           </Text>

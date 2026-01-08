@@ -9,7 +9,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -18,6 +18,7 @@ import { Button } from '@/components/ui';
 import { SettingsSection, SettingsRow } from '@/components/settings';
 import { exportLogsForSupport, shareExportedLogs } from '@/services/sync/sync-export';
 import { logger } from '@/services/monitoring';
+import { showAlert } from '@/utils/alert';
 import type { HomeStackParamList } from '@/navigation/types';
 
 // App version from package.json
@@ -83,14 +84,14 @@ export function SettingsScreen(): React.ReactElement {
         await shareExportedLogs(result.filePath);
         logger.info('Diagnostic logs exported successfully', { category: 'settings' });
       } else {
-        Alert.alert('Export Failed', result.error || 'Unable to export logs');
+        showAlert('Export Failed', result.error || 'Unable to export logs');
         logger.error('Log export failed', new Error(result.error || 'Unknown error'), {
           category: 'settings',
         });
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
-      Alert.alert('Export Failed', message);
+      showAlert('Export Failed', message);
       logger.error('Log export error', error as Error, { category: 'settings' });
     } finally {
       setIsExporting(false);
@@ -114,7 +115,7 @@ export function SettingsScreen(): React.ReactElement {
   }, [navigation]);
 
   const handleLogout = useCallback(async () => {
-    Alert.alert(
+    showAlert(
       'Sign Out',
       'Are you sure you want to sign out? Any unsynced data will remain on this device.',
       [
@@ -139,10 +140,16 @@ export function SettingsScreen(): React.ReactElement {
         {/* Account Section */}
         <SettingsSection title="Account">
           <View style={styles.accountCard}>
-            <Text style={styles.accountName}>{user.name}</Text>
-            <Text style={styles.accountEmail}>{user.email || 'Email not available'}</Text>
+            <Text style={styles.accountName} testID="settings-user-name">
+              {user.name}
+            </Text>
+            <Text style={styles.accountEmail} testID="settings-user-email">
+              {user.email || 'Email not available'}
+            </Text>
             <View style={styles.accountMeta}>
-              <Text style={styles.accountMetaText}>{capitalizedRole}</Text>
+              <Text style={styles.accountMetaText} testID="settings-user-role">
+                {capitalizedRole}
+              </Text>
               <Text style={styles.accountMetaDot}> </Text>
               <Text style={styles.accountMetaText}>Site: {user.siteId.slice(0, 8)}</Text>
             </View>
@@ -157,6 +164,8 @@ export function SettingsScreen(): React.ReactElement {
             value={isOnline ? 'Tap for details' : 'Device is offline'}
             onPress={handleSyncDetails}
             accessibilityLabel="View sync status details"
+            testID="settings-sync-details"
+            labelTestID="settings-sync-status"
           />
         </SettingsSection>
 
@@ -218,7 +227,12 @@ export function SettingsScreen(): React.ReactElement {
 
         {/* Sign Out Button */}
         <View style={styles.signOutContainer}>
-          <Button title="Sign Out" variant="secondary" onPress={handleLogout} />
+          <Button
+            title="Sign Out"
+            variant="secondary"
+            onPress={handleLogout}
+            testID="settings-logout-button"
+          />
         </View>
       </ScrollView>
     </SafeAreaView>

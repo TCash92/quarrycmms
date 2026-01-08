@@ -7,13 +7,15 @@ import { TOUCH_TARGETS } from '@/constants';
 interface AssetCardProps {
   asset: Asset;
   onPress: () => void;
+  /** testID for E2E testing */
+  testID?: string;
 }
 
 /**
  * Card component for displaying an asset in a list
  * Shows asset number, name, category, and status badge
  */
-export function AssetCard({ asset, onPress }: AssetCardProps): React.ReactElement {
+export function AssetCard({ asset, onPress, testID }: AssetCardProps): React.ReactElement {
   return (
     <TouchableOpacity
       style={styles.card}
@@ -22,6 +24,7 @@ export function AssetCard({ asset, onPress }: AssetCardProps): React.ReactElemen
       accessibilityRole="button"
       accessibilityLabel={`${asset.assetNumber}, ${asset.name}, ${asset.status}`}
       accessibilityHint="Double tap to view asset details"
+      testID={testID}
     >
       <View style={styles.header}>
         <Text style={styles.assetNumber}>{asset.assetNumber}</Text>

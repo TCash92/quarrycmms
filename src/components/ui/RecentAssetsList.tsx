@@ -28,6 +28,8 @@ interface RecentAssetsListProps {
   onSelect: (assetId: string) => void;
   /** Whether assets are loading */
   isLoading: boolean;
+  /** testID for E2E testing */
+  testID?: string;
 }
 
 /**
@@ -41,6 +43,7 @@ export function RecentAssetsList({
   selectedId,
   onSelect,
   isLoading,
+  testID,
 }: RecentAssetsListProps): React.ReactElement {
   if (isLoading) {
     return (
@@ -90,6 +93,7 @@ export function RecentAssetsList({
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.listContent}
       ItemSeparatorComponent={() => <View style={styles.separator} />}
+      testID={testID}
     />
   );
 }
