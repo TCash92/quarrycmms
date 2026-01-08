@@ -3,6 +3,10 @@
  * Configures global mocks and test environment
  */
 
+// Define __DEV__ for expo modules that check this global
+// Must be defined before any expo imports
+(global as any).__DEV__ = true;
+
 // Import mocks to register them
 import './mocks';
 

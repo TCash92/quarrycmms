@@ -248,6 +248,76 @@ jest.mock('expo-task-manager', () => ({
   getRegisteredTasksAsync: jest.fn().mockResolvedValue([]),
 }));
 
+// Mock expo-file-system
+// Note: paths must match what tests expect (e.g., sync-diagnostics.test.ts uses /cache/ and /documents/)
+jest.mock('expo-file-system', () => ({
+  documentDirectory: '/documents/',
+  cacheDirectory: '/cache/',
+  getInfoAsync: jest.fn().mockResolvedValue({ exists: true, size: 1024, isDirectory: false }),
+  readAsStringAsync: jest.fn().mockResolvedValue(''),
+  writeAsStringAsync: jest.fn().mockResolvedValue(undefined),
+  deleteAsync: jest.fn().mockResolvedValue(undefined),
+  makeDirectoryAsync: jest.fn().mockResolvedValue(undefined),
+  readDirectoryAsync: jest.fn().mockResolvedValue([]),
+  copyAsync: jest.fn().mockResolvedValue(undefined),
+  moveAsync: jest.fn().mockResolvedValue(undefined),
+  downloadAsync: jest.fn().mockResolvedValue({ uri: 'file:///mock/download' }),
+}));
+
+// Mock expo-file-system/legacy (used by sync-diagnostics)
+// Uses same paths as expo-file-system for consistency
+jest.mock('expo-file-system/legacy', () => ({
+  cacheDirectory: '/cache/',
+  documentDirectory: '/documents/',
+}));
+
+// Mock expo-device
+jest.mock('expo-device', () => ({
+  isDevice: true,
+  brand: 'MockBrand',
+  manufacturer: 'MockManufacturer',
+  modelName: 'MockModel',
+  modelId: 'mock-model-id',
+  designName: 'mock-design',
+  productName: 'MockProduct',
+  deviceYearClass: 2024,
+  totalMemory: 8 * 1024 * 1024 * 1024, // 8GB
+  supportedCpuArchitectures: ['arm64'],
+  osName: 'Android',
+  osVersion: '14',
+  osBuildId: 'mock-build-id',
+  osInternalBuildId: 'mock-internal-build-id',
+  osBuildFingerprint: 'mock-fingerprint',
+  platformApiLevel: 34,
+  deviceName: 'Mock Device',
+  DeviceType: {
+    UNKNOWN: 0,
+    PHONE: 1,
+    TABLET: 2,
+    DESKTOP: 3,
+    TV: 4,
+  },
+  getDeviceTypeAsync: jest.fn().mockResolvedValue(1), // PHONE
+  getUptimeAsync: jest.fn().mockResolvedValue(86400000), // 1 day
+  getMaxMemoryAsync: jest.fn().mockResolvedValue(8 * 1024 * 1024 * 1024),
+  isRootedExperimentalAsync: jest.fn().mockResolvedValue(false),
+  isSideLoadingEnabledAsync: jest.fn().mockResolvedValue(false),
+  getPlatformFeaturesAsync: jest.fn().mockResolvedValue([]),
+}));
+
+// Mock expo-application
+jest.mock('expo-application', () => ({
+  applicationName: 'QuarryCMMS',
+  applicationId: 'com.quarry.cmms',
+  nativeApplicationVersion: '1.0.0',
+  nativeBuildVersion: '1',
+  androidId: 'mock-android-id',
+  getIosIdForVendorAsync: jest.fn().mockResolvedValue('mock-ios-vendor-id'),
+  getInstallReferrerAsync: jest.fn().mockResolvedValue(null),
+  getLastUpdateTimeAsync: jest.fn().mockResolvedValue(Date.now()),
+  getInstallationTimeAsync: jest.fn().mockResolvedValue(Date.now() - 86400000),
+}));
+
 // Mock Sentry
 jest.mock('@sentry/react-native', () => ({
   init: jest.fn(),
