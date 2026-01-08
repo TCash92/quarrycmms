@@ -148,7 +148,7 @@ export function AssetDetailScreen(): React.ReactElement {
         <View style={styles.header}>
           <Text style={styles.assetName}>{asset.name}</Text>
           <View style={styles.statusRow}>
-            <StatusBadge status={asset.status} size="medium" />
+            <StatusBadge status={asset.status} size="medium" testID="asset-detail-status" />
           </View>
         </View>
 
@@ -162,7 +162,7 @@ export function AssetDetailScreen(): React.ReactElement {
         {/* Meter Readings (if asset has meter) */}
         {asset.hasMeter && (
           <Section title="Meter Reading">
-            <View style={styles.meterCard}>
+            <View style={styles.meterCard} testID="asset-detail-meter-reading">
               <View style={styles.meterHeader}>
                 <Text style={styles.meterType}>{asset.meterType}</Text>
                 <Text style={styles.meterUnit}>{asset.meterUnit}</Text>
@@ -180,6 +180,8 @@ export function AssetDetailScreen(): React.ReactElement {
                 assetId={asset.id}
                 meterType={asset.meterType || 'Hours'}
                 meterUnit={asset.meterUnit || undefined}
+                testIDInput="asset-detail-meter-input"
+                testIDButton="asset-detail-record-button"
               />
             </View>
           </Section>

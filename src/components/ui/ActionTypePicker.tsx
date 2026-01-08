@@ -16,6 +16,8 @@ interface ActionTypePickerProps {
   value: QuickLogActionType | null;
   /** Callback when action type is selected */
   onChange: (type: QuickLogActionType) => void;
+  /** Base testID for E2E testing - buttons get suffixes like -emergency, -maintenance, -inspection */
+  testID?: string;
 }
 
 const ACTION_TYPES: QuickLogActionType[] = ['emergency_repair', 'maintenance_pm', 'inspection'];
@@ -28,7 +30,17 @@ const ACTION_TYPES: QuickLogActionType[] = ['emergency_repair', 'maintenance_pm'
  * - Maintenance / PM (blue)
  * - Inspection (green)
  */
-export function ActionTypePicker({ value, onChange }: ActionTypePickerProps): React.ReactElement {
+const ACTION_TYPE_TEST_ID_MAP: Record<QuickLogActionType, string> = {
+  emergency_repair: 'emergency',
+  maintenance_pm: 'maintenance',
+  inspection: 'inspection',
+};
+
+export function ActionTypePicker({
+  value,
+  onChange,
+  testID,
+}: ActionTypePickerProps): React.ReactElement {
   return (
     <View style={styles.container}>
       {ACTION_TYPES.map(actionType => {
@@ -48,6 +60,7 @@ export function ActionTypePicker({ value, onChange }: ActionTypePickerProps): Re
             accessibilityRole="radio"
             accessibilityState={{ selected: isSelected }}
             accessibilityLabel={`${config.label} action type`}
+            testID={testID ? `${testID}-${ACTION_TYPE_TEST_ID_MAP[actionType]}` : undefined}
           >
             <Text style={[styles.buttonText, { color: isSelected ? '#FFFFFF' : config.color }]}>
               {config.label}

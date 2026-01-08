@@ -70,7 +70,7 @@ export class ConfigurationError extends Error {
 
 /**
  * Validates that all required configuration values are present.
- * Call this on app startup.
+ * Call this on app startup (skipped in E2E test mode with mocked services).
  * @throws ConfigurationError if any required config is missing
  */
 export function validateConfig(): void {

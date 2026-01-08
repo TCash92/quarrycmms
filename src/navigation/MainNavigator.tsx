@@ -40,6 +40,7 @@ export function MainNavigator(): React.ReactElement {
           headerShown: false, // HomeStackNavigator has its own header
           tabBarLabel: 'Home',
           tabBarAccessibilityLabel: 'Home tab',
+          tabBarButtonTestID: 'tab-home',
         }}
       />
       <Tab.Screen
@@ -49,6 +50,7 @@ export function MainNavigator(): React.ReactElement {
           headerShown: false,
           tabBarLabel: 'Assets',
           tabBarAccessibilityLabel: 'Assets tab',
+          tabBarButtonTestID: 'tab-assets',
         }}
       />
       <Tab.Screen
@@ -58,6 +60,7 @@ export function MainNavigator(): React.ReactElement {
           headerShown: false,
           tabBarLabel: 'Work',
           tabBarAccessibilityLabel: 'Work Orders tab',
+          tabBarButtonTestID: 'tab-work-orders',
         }}
       />
       <Tab.Screen
@@ -67,6 +70,7 @@ export function MainNavigator(): React.ReactElement {
           title: 'Quick Log',
           tabBarLabel: 'Quick Log',
           tabBarAccessibilityLabel: 'Quick Log tab',
+          tabBarButtonTestID: 'tab-quick-log',
         }}
       />
     </Tab.Navigator>

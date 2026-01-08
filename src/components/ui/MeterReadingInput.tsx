@@ -24,6 +24,10 @@ interface MeterReadingInputProps {
   onSave?: ((value: number) => void) | undefined;
   /** Callback with validation result on value change */
   onValidation?: ((result: MeterValidationResult) => void) | undefined;
+  /** testID for the input field */
+  testIDInput?: string;
+  /** testID for the save button */
+  testIDButton?: string;
 }
 
 /**
@@ -56,6 +60,8 @@ export function MeterReadingInput({
   meterUnit,
   onSave,
   onValidation,
+  testIDInput,
+  testIDButton,
 }: MeterReadingInputProps): React.ReactElement {
   const { latestReading, isLoading, isSubmitting, validateReading, createReading, error } =
     useMeterReadings(assetId);
@@ -154,6 +160,7 @@ export function MeterReadingInput({
             onBlur={() => setIsFocused(false)}
             editable={!isLoading && !isSubmitting}
             accessibilityLabel={`Enter ${meterType} reading`}
+            testID={testIDInput}
           />
         </View>
 
@@ -164,6 +171,7 @@ export function MeterReadingInput({
           accessibilityRole="button"
           accessibilityLabel="Save meter reading"
           accessibilityState={{ disabled: !canSave }}
+          testID={testIDButton}
         >
           <Text style={[styles.saveButtonText, !canSave && styles.saveButtonTextDisabled]}>
             {isSubmitting ? 'Saving...' : 'Save'}

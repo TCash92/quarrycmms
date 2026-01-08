@@ -7,6 +7,8 @@ export type WorkOrderPriority = keyof typeof PRIORITY_LEVELS;
 interface PriorityBadgeProps {
   priority: WorkOrderPriority;
   size?: 'small' | 'medium' | 'large';
+  /** testID for E2E testing */
+  testID?: string;
 }
 
 const SIZE_CONFIG = {
@@ -37,6 +39,7 @@ const SIZE_CONFIG = {
 export function PriorityBadge({
   priority,
   size = 'medium',
+  testID,
 }: PriorityBadgeProps): React.ReactElement {
   const priorityConfig = PRIORITY_LEVELS[priority];
   const sizeConfig = SIZE_CONFIG[size];
@@ -53,6 +56,7 @@ export function PriorityBadge({
       ]}
       accessibilityRole="text"
       accessibilityLabel={`Priority: ${priorityConfig.label}`}
+      testID={testID}
     >
       <View
         style={[

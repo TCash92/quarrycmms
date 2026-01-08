@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { RootNavigator } from '@/app';
@@ -13,6 +13,10 @@ import {
   stopPeriodicTelemetry,
 } from '@/services/monitoring';
 import { checkDatabaseHealth } from '@/services/recovery';
+import { showAlert } from '@/utils/alert';
+
+// E2E Test Mode Detection
+const IS_E2E_TEST = process.env.EXPO_PUBLIC_E2E_TEST === 'true';
 
 /**
  * Application entry point
@@ -25,44 +29,65 @@ export default function App(): React.ReactElement {
   useEffect(() => {
     const initializeApp = async (): Promise<void> => {
       try {
-        // Initialize monitoring first (before config validation can fail)
-        initMonitoring({
-          sentryDsn: config.sentryDsn,
-          environment: config.environment,
-          enablePerformance: true,
-          enableAnalytics: config.enableAnalytics,
-          sampleRate: 0.1, // 10% of transactions
-        });
-
-        validateConfig();
-
-        // Run database health check
-        try {
-          const healthReport = await checkDatabaseHealth();
-
-          if (!healthReport.healthy) {
-            logger.warn('Database health issues detected', {
-              category: 'app',
-              integrityErrors: healthReport.integrityErrors.length,
-              recommendations: healthReport.recommendations,
-            });
-
-            // Show alert to user about database issues
-            Alert.alert(
-              'Database Issue Detected',
-              'Some database issues were detected. You can continue using the app, but consider going to Settings > Reset Local Database if you experience problems.',
-              [{ text: 'OK', style: 'default' }]
-            );
+        // Initialize MSW for E2E testing (web only)
+        if (IS_E2E_TEST && Platform.OS === 'web') {
+          try {
+            const { startMockServiceWorker } = await import('./e2e/mocks/browser');
+            await startMockServiceWorker();
+            console.log('[E2E] Mock Service Worker initialized');
+          } catch (mswError) {
+            console.error('[E2E] Failed to start MSW:', mswError);
           }
-        } catch (healthError) {
-          logger.error('Database health check failed', healthError as Error, { category: 'app' });
-          // Continue app initialization even if health check fails
         }
 
-        // Start periodic telemetry collection (every 4 hours)
-        schedulePeriodicTelemetry(4 * 60 * 60 * 1000);
+        // Initialize monitoring first (before config validation can fail)
+        // Skip monitoring in E2E test mode
+        if (!IS_E2E_TEST) {
+          initMonitoring({
+            sentryDsn: config.sentryDsn,
+            environment: config.environment,
+            enablePerformance: true,
+            enableAnalytics: config.enableAnalytics,
+            sampleRate: 0.1, // 10% of transactions
+          });
+        }
 
-        logger.info('App initialized successfully', { category: 'app' });
+        // Skip config validation in E2E mode (using mocked services)
+        if (!IS_E2E_TEST) {
+          validateConfig();
+        }
+
+        // Run database health check (skip in E2E mode)
+        if (!IS_E2E_TEST) {
+          try {
+            const healthReport = await checkDatabaseHealth();
+
+            if (!healthReport.healthy) {
+              logger.warn('Database health issues detected', {
+                category: 'app',
+                integrityErrors: healthReport.integrityErrors.length,
+                recommendations: healthReport.recommendations,
+              });
+
+              // Show alert to user about database issues
+              showAlert(
+                'Database Issue Detected',
+                'Some database issues were detected. You can continue using the app, but consider going to Settings > Reset Local Database if you experience problems.',
+                [{ text: 'OK', style: 'default' }]
+              );
+            }
+          } catch (healthError) {
+            logger.error('Database health check failed', healthError as Error, { category: 'app' });
+            // Continue app initialization even if health check fails
+          }
+
+          // Start periodic telemetry collection (every 4 hours)
+          schedulePeriodicTelemetry(4 * 60 * 60 * 1000);
+
+          logger.info('App initialized successfully', { category: 'app' });
+        } else {
+          console.log('[E2E] App initialized in test mode');
+        }
         setIsReady(true);
       } catch (error) {
         if (error instanceof ConfigurationError) {

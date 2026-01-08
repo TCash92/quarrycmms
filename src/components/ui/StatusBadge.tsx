@@ -7,6 +7,8 @@ export type AssetStatusType = keyof typeof ASSET_STATUS;
 interface StatusBadgeProps {
   status: AssetStatusType;
   size?: 'small' | 'medium' | 'large';
+  /** testID for E2E testing */
+  testID?: string;
 }
 
 const SIZE_CONFIG = {
@@ -34,7 +36,11 @@ const SIZE_CONFIG = {
  * Status indicator badge for assets
  * Shows colored dot and status label
  */
-export function StatusBadge({ status, size = 'medium' }: StatusBadgeProps): React.ReactElement {
+export function StatusBadge({
+  status,
+  size = 'medium',
+  testID,
+}: StatusBadgeProps): React.ReactElement {
   const statusConfig = ASSET_STATUS[status];
   const sizeConfig = SIZE_CONFIG[size];
 
@@ -50,6 +56,7 @@ export function StatusBadge({ status, size = 'medium' }: StatusBadgeProps): Reac
       ]}
       accessibilityRole="text"
       accessibilityLabel={`Status: ${statusConfig.label}`}
+      testID={testID}
     >
       <View
         style={[

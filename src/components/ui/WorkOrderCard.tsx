@@ -7,6 +7,8 @@ import { TOUCH_TARGETS } from '@/constants';
 interface WorkOrderCardProps {
   workOrder: WorkOrder;
   onPress: () => void;
+  /** testID for E2E testing */
+  testID?: string;
 }
 
 /**
@@ -32,7 +34,11 @@ function formatDueDate(timestamp: number | null): string | null {
  * Card component for displaying a work order in a list
  * Shows priority badge, WO number, title, asset, and due date
  */
-export function WorkOrderCard({ workOrder, onPress }: WorkOrderCardProps): React.ReactElement {
+export function WorkOrderCard({
+  workOrder,
+  onPress,
+  testID,
+}: WorkOrderCardProps): React.ReactElement {
   const [assetName, setAssetName] = useState<string>('');
 
   // Fetch the related asset name
@@ -64,6 +70,7 @@ export function WorkOrderCard({ workOrder, onPress }: WorkOrderCardProps): React
       accessibilityRole="button"
       accessibilityLabel={`${workOrder.woNumber}, ${workOrder.title}, ${workOrder.priority} priority`}
       accessibilityHint="Double tap to view work order details"
+      testID={testID}
     >
       <View style={styles.header}>
         <PriorityBadge priority={workOrder.priority} size="small" />

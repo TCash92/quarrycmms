@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, StyleSheet, StatusBar, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useCurrentUser, useSync, useQuickStats } from '@/hooks';
 import { TOUCH_TARGETS } from '@/constants';
@@ -80,8 +80,16 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<HomeStackParamList, 'H
 export function HomeScreen(): React.ReactElement {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const user = useCurrentUser();
-  const { syncStatus, isOnline, performSync, isSyncing, queueStats } = useSync();
+  const { syncStatus, isOnline, performSync, isSyncing, queueStats, refreshStatus } = useSync();
   const quickStats = useQuickStats();
+
+  // Refresh sync status when screen comes into focus
+  // This ensures pending count updates after creating quick logs or other changes
+  useFocusEffect(
+    useCallback(() => {
+      refreshStatus();
+    }, [refreshStatus])
+  );
 
   const capitalizedRole = user.role.charAt(0).toUpperCase() + user.role.slice(1);
 
@@ -91,7 +99,9 @@ export function HomeScreen(): React.ReactElement {
 
       {/* Header with greeting */}
       <View style={styles.header}>
-        <Text style={styles.greeting}>Hello, {user.name}</Text>
+        <Text style={styles.greeting} testID="home-greeting">
+          Hello, {user.name}
+        </Text>
         <Text style={styles.role}>{capitalizedRole}</Text>
       </View>
 
@@ -103,6 +113,7 @@ export function HomeScreen(): React.ReactElement {
         disabled={!isOnline || isSyncing}
         accessibilityRole="button"
         accessibilityLabel={`Sync status: ${isSyncing ? 'Syncing' : syncStatus.status}. Tap to sync.`}
+        testID="home-sync-card"
       >
         <View style={styles.statusRow}>
           <View
@@ -116,7 +127,7 @@ export function HomeScreen(): React.ReactElement {
               },
             ]}
           />
-          <Text style={styles.statusText}>
+          <Text style={styles.statusText} testID="home-sync-status">
             {!isOnline
               ? 'Offline Mode'
               : isSyncing
@@ -126,7 +137,7 @@ export function HomeScreen(): React.ReactElement {
           {isOnline && !isSyncing && <Text style={styles.syncHint}>Tap to sync</Text>}
         </View>
         {syncStatus.pendingChanges > 0 && (
-          <Text style={styles.pendingText}>
+          <Text style={styles.pendingText} testID="home-pending-count">
             {syncStatus.pendingChanges} pending change
             {syncStatus.pendingChanges !== 1 ? 's' : ''}
           </Text>
@@ -150,7 +161,7 @@ export function HomeScreen(): React.ReactElement {
       </TouchableOpacity>
 
       {/* Quick Stats */}
-      <View style={styles.statsContainer}>
+      <View style={styles.statsContainer} testID="home-quick-stats">
         <Text style={styles.sectionTitle}>Quick Stats</Text>
         <View style={styles.statsGrid}>
           <StatCard

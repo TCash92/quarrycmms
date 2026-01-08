@@ -15,6 +15,8 @@ import type { FailureType } from '@/database/models/WorkOrder';
 interface FailureTypePickerProps {
   value: FailureType;
   onChange: (failureType: FailureType) => void;
+  /** testID for E2E testing - chips get suffixed with failure type key */
+  testID?: string;
 }
 
 const FAILURE_TYPE_OPTIONS: FailureType[] = ['none', 'wore_out', 'broke', 'unknown'];
@@ -23,7 +25,11 @@ const FAILURE_TYPE_OPTIONS: FailureType[] = ['none', 'wore_out', 'broke', 'unkno
  * Failure type selection component for work order completion
  * Displays failure type options as tappable chips
  */
-export function FailureTypePicker({ value, onChange }: FailureTypePickerProps): React.ReactElement {
+export function FailureTypePicker({
+  value,
+  onChange,
+  testID,
+}: FailureTypePickerProps): React.ReactElement {
   return (
     <View style={styles.container}>
       {FAILURE_TYPE_OPTIONS.map(failureType => {
@@ -38,6 +44,7 @@ export function FailureTypePicker({ value, onChange }: FailureTypePickerProps): 
             accessibilityRole="radio"
             accessibilityState={{ selected: isSelected }}
             accessibilityLabel={`Failure type: ${config.label}`}
+            testID={testID ? `${testID}-${failureType.replace('_', '-')}` : undefined}
           >
             <Text
               style={[

@@ -16,6 +16,8 @@ export type WorkOrderStatusType = keyof typeof WORK_ORDER_STATUS;
 interface WorkOrderStatusBadgeProps {
   status: WorkOrderStatusType;
   size?: 'small' | 'medium' | 'large';
+  /** testID for E2E testing */
+  testID?: string;
 }
 
 const SIZE_CONFIG = {
@@ -46,6 +48,7 @@ const SIZE_CONFIG = {
 export function WorkOrderStatusBadge({
   status,
   size = 'medium',
+  testID,
 }: WorkOrderStatusBadgeProps): React.ReactElement {
   const statusConfig = WORK_ORDER_STATUS[status];
   const sizeConfig = SIZE_CONFIG[size];
@@ -62,6 +65,7 @@ export function WorkOrderStatusBadge({
       ]}
       accessibilityRole="text"
       accessibilityLabel={`Status: ${statusConfig.label}`}
+      testID={testID}
     >
       <View
         style={[

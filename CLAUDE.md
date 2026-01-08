@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-QuarryCMMS is an offline-first maintenance management system for Canadian aggregate/quarry operations. The design philosophy prioritizes capturing *imperfect* data instantly over capturing *perfect* data never—built for no cell signal, -25°C winters, gloved hands, and technicians who need to log work in 30 seconds.
+QuarryCMMS is an offline-first maintenance management system for Canadian aggregate/quarry operations. The design philosophy prioritizes capturing _imperfect_ data instantly over capturing _perfect_ data never—built for no cell signal, -25°C winters, gloved hands, and technicians who need to log work in 30 seconds.
 
 ## Commands
 
@@ -36,38 +36,68 @@ npm run test:coverage # Coverage report
 ```
 
 ### Test Structure
+
 - Tests live in `src/__tests__/` mirroring source structure
 - Mocks in `src/__tests__/mocks/` (WatermelonDB, Supabase, NetInfo)
 - Helpers in `src/__tests__/helpers/`
 
 ### Coverage Targets
 
-| Module | Target | Rationale |
-|--------|--------|-----------|
+| Module           | Target          | Rationale                    |
+| ---------------- | --------------- | ---------------------------- |
 | `services/sync/` | 60%+ (enforced) | Safety-critical offline sync |
-| `services/auth/` | 80%+ | Security-critical |
-| `hooks/` | 70%+ | Shared logic |
+| `services/auth/` | 80%+            | Security-critical            |
+| `hooks/`         | 70%+            | Shared logic                 |
 
 ### TDD Approach
+
 1. Write failing tests FIRST
 2. Implement code to pass tests
 3. NEVER modify tests to match buggy implementation
 
+## E2E Testing (Playwright)
+
+```bash
+npm run e2e           # Run Playwright E2E tests (web)
+npm run e2e:ui        # Run with Playwright UI
+npm run e2e:debug     # Debug mode
+```
+
+### E2E Infrastructure
+
+- **Page Objects**: `e2e/pages/` - Reusable page interactions
+- **Test Fixtures**: `e2e/fixtures/` - Test data
+- **MSW Mocks**: `e2e/mocks/` - API mocking for offline testing
+- **Web Platform Mocks**: Files ending in `.web.ts` auto-resolve for web via Metro
+
+### E2E Test Mode
+
+Set `EXPO_PUBLIC_E2E_TEST=true` to enable:
+
+- MSW mock service worker for API interception
+- In-memory WatermelonDB mock (no SQLite)
+- Skipped config validation and monitoring
+
 ## Git Workflow
 
 ### Branch Naming
+
 - `feat/xxx` — New features
 - `fix/xxx` — Bug fixes
 - `docs/xxx` — Documentation only
 
 ### Commit Messages
+
 Use conventional commits format:
+
 - `feat: add voice note transcription`
 - `fix: resolve sync conflict in offline mode`
 - `docs: update CLAUDE.md with testing section`
 
 ### Pre-commit Checks
+
 Husky runs automatically on commit:
+
 1. TypeScript type check (`npm run typecheck`)
 2. ESLint + Prettier on staged files
 3. Jest tests for related files
@@ -75,6 +105,7 @@ Husky runs automatically on commit:
 ## Architecture
 
 ### Tech Stack
+
 - **React Native 0.81** via Expo SDK 54
 - **WatermelonDB** (SQLite with JSI) for offline-first local database
 - **Supabase** for backend (auth, database sync, storage)
@@ -103,12 +134,14 @@ src/
 ### Key Architectural Patterns
 
 **Offline-First Sync**: All data operations happen locally first via WatermelonDB. The sync engine (`src/services/sync/`) handles:
+
 - Pull/push synchronization with Supabase
 - Field-level conflict resolution (last-write-wins with audit trail)
 - Retry queue with exponential backoff for failed operations
 - Photo sync handled separately from metadata
 
 **Quick Log + Enrichment**: Two-phase data capture:
+
 1. Technicians create "Quick Logs" with minimal data (voice notes, photos, 2-word descriptions)
 2. Supervisors "enrich" Quick Logs later with structured data via batch UI
 
@@ -117,6 +150,7 @@ src/
 ### Database Schema (WatermelonDB)
 
 Four main tables in `src/database/schema.ts`:
+
 - **work_orders**: Maintenance requests with Quick Log support, voice notes, signatures
 - **assets**: Equipment inventory with meter tracking
 - **meter_readings**: Equipment telemetry
@@ -138,6 +172,7 @@ RootNavigator
 ## TypeScript Configuration
 
 Strict mode is fully enabled with additional checks:
+
 - `noUncheckedIndexedAccess`
 - Path alias: `@/*` → `src/*`
 - Decorators enabled for WatermelonDB models
@@ -145,6 +180,7 @@ Strict mode is fully enabled with additional checks:
 ## Environment Configuration
 
 Copy `.env.example` to `.env.development` and configure:
+
 ```
 EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
@@ -179,6 +215,7 @@ These rules prevent common mistakes:
 ## Red Team Personas
 
 Before making design changes, review `docs/PERSONAS.md`. These 8 personas stress-test decisions:
+
 - Dave (skeptical technician)
 - Sandra (risk-averse operations manager)
 - Robert (ministry inspector)
@@ -190,10 +227,10 @@ Before making design changes, review `docs/PERSONAS.md`. These 8 personas stress
 
 ## Key Files for Common Tasks
 
-| Task | Key Files |
-|------|-----------|
+| Task                   | Key Files                                                                                      |
+| ---------------------- | ---------------------------------------------------------------------------------------------- |
 | Add new database table | `src/database/schema.ts`, `src/database/migrations.ts`, create model in `src/database/models/` |
-| Modify sync behavior | `src/services/sync/sync-engine.ts`, `src/services/sync/conflict-resolver.ts` |
-| Add new screen | Create in `src/screens/`, add to appropriate navigator in `src/navigation/` |
-| Add new hook | `src/hooks/`, export from `src/hooks/index.ts` |
-| Modify auth flow | `src/services/auth/AuthProvider.tsx`, `src/services/auth/auth-service.ts` |
+| Modify sync behavior   | `src/services/sync/sync-engine.ts`, `src/services/sync/conflict-resolver.ts`                   |
+| Add new screen         | Create in `src/screens/`, add to appropriate navigator in `src/navigation/`                    |
+| Add new hook           | `src/hooks/`, export from `src/hooks/index.ts`                                                 |
+| Modify auth flow       | `src/services/auth/AuthProvider.tsx`, `src/services/auth/auth-service.ts`                      |

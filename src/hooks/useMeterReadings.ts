@@ -10,8 +10,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Q } from '@nozbe/watermelondb';
-import { useDatabase } from '@nozbe/watermelondb/react';
+import { useDatabase, Q } from '@/database';
 import MeterReading from '@/database/models/MeterReading';
 import Asset from '@/database/models/Asset';
 import { useCurrentUser } from './useAuth';

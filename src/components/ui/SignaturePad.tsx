@@ -10,7 +10,7 @@
  * @module components/ui/SignaturePad
  */
 
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import {
   StyleSheet,
   PanResponder,
   GestureResponderEvent,
+  Platform,
 } from 'react-native';
 import { TOUCH_TARGETS } from '@/constants';
 
@@ -56,6 +57,9 @@ export function SignaturePad({
   const containerRef = useRef<View>(null);
   const containerLayoutRef = useRef({ x: 0, y: 0, width: 0, height: 0 });
 
+  // Use ref to track current stroke for PanResponder callbacks (avoids closure staleness)
+  const currentStrokeRef = useRef<Point[]>([]);
+
   const handleLayout = useCallback(
     (event: {
       nativeEvent: { layout: { x: number; y: number; width: number; height: number } };
@@ -80,15 +84,19 @@ export function SignaturePad({
       onMoveShouldSetPanResponder: () => !disabled,
       onPanResponderGrant: (event: GestureResponderEvent) => {
         const point = getPointFromEvent(event);
+        currentStrokeRef.current = [point];
         setCurrentStroke([point]);
       },
       onPanResponderMove: (event: GestureResponderEvent) => {
         const point = getPointFromEvent(event);
-        setCurrentStroke(prev => [...prev, point]);
+        currentStrokeRef.current = [...currentStrokeRef.current, point];
+        setCurrentStroke(currentStrokeRef.current);
       },
       onPanResponderRelease: () => {
-        if (currentStroke.length > 0) {
-          setStrokes(prev => [...prev, { points: currentStroke }]);
+        // Use ref instead of state to avoid closure staleness
+        if (currentStrokeRef.current.length > 0) {
+          setStrokes(prev => [...prev, { points: currentStrokeRef.current }]);
+          currentStrokeRef.current = [];
           setCurrentStroke([]);
           setHasSignature(true);
         }
@@ -96,9 +104,68 @@ export function SignaturePad({
     })
   ).current;
 
+  // Web-specific pointer event handling for E2E testing and mouse input
+  // PanResponder on web doesn't always capture synthetic pointer events from tests
+  const isDrawingRef = useRef(false);
+
+  useEffect(() => {
+    if (Platform.OS !== 'web' || disabled) return;
+
+    const element = document.querySelector('[data-testid="signature-pad"]');
+    if (!element) return;
+
+    const getPointFromPointerEvent = (e: PointerEvent): Point => {
+      const rect = element.getBoundingClientRect();
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
+    };
+
+    const handlePointerDown = (e: PointerEvent) => {
+      e.preventDefault();
+      isDrawingRef.current = true;
+      const point = getPointFromPointerEvent(e);
+      currentStrokeRef.current = [point];
+      setCurrentStroke([point]);
+    };
+
+    const handlePointerMove = (e: PointerEvent) => {
+      if (!isDrawingRef.current) return;
+      e.preventDefault();
+      const point = getPointFromPointerEvent(e);
+      currentStrokeRef.current = [...currentStrokeRef.current, point];
+      setCurrentStroke(currentStrokeRef.current);
+    };
+
+    const handlePointerUp = () => {
+      if (!isDrawingRef.current) return;
+      isDrawingRef.current = false;
+      if (currentStrokeRef.current.length > 0) {
+        setStrokes(prev => [...prev, { points: currentStrokeRef.current }]);
+        currentStrokeRef.current = [];
+        setCurrentStroke([]);
+        setHasSignature(true);
+      }
+    };
+
+    element.addEventListener('pointerdown', handlePointerDown as EventListener);
+    element.addEventListener('pointermove', handlePointerMove as EventListener);
+    element.addEventListener('pointerup', handlePointerUp as EventListener);
+    element.addEventListener('pointerleave', handlePointerUp as EventListener);
+
+    return () => {
+      element.removeEventListener('pointerdown', handlePointerDown as EventListener);
+      element.removeEventListener('pointermove', handlePointerMove as EventListener);
+      element.removeEventListener('pointerup', handlePointerUp as EventListener);
+      element.removeEventListener('pointerleave', handlePointerUp as EventListener);
+    };
+  }, [disabled]);
+
   const handleClear = () => {
     setStrokes([]);
     setCurrentStroke([]);
+    currentStrokeRef.current = [];
     setHasSignature(false);
   };
 
@@ -169,6 +236,7 @@ export function SignaturePad({
         ref={containerRef}
         style={styles.padContainer}
         onLayout={handleLayout}
+        testID="signature-pad"
         {...panResponder.panHandlers}
       >
         {!hasSignature && strokes.length === 0 && (

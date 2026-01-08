@@ -31,6 +31,8 @@ interface TimerProps {
   onResume: () => void;
   /** Called to set time manually (in minutes) */
   onManualSet: (minutes: number) => void;
+  /** Test ID for E2E testing */
+  testID?: string;
 }
 
 /**
@@ -62,6 +64,7 @@ export function Timer({
   onPause,
   onResume,
   onManualSet,
+  testID,
 }: TimerProps): React.ReactElement {
   const [showManualInput, setShowManualInput] = useState(false);
   const [manualMinutes, setManualMinutes] = useState('');
@@ -85,7 +88,7 @@ export function Timer({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID={testID}>
       {/* Timer Display */}
       <View style={styles.timerDisplay}>
         <Text style={styles.timerText}>{formattedTime}</Text>

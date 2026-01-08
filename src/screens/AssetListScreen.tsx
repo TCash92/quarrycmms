@@ -90,7 +90,7 @@ export function AssetListScreen(): React.ReactElement {
 
   const renderItem = useCallback(
     ({ item }: { item: Asset }) => (
-      <AssetCard asset={item} onPress={() => handleAssetPress(item)} />
+      <AssetCard asset={item} onPress={() => handleAssetPress(item)} testID="asset-card" />
     ),
     [handleAssetPress]
   );
@@ -130,11 +130,17 @@ export function AssetListScreen(): React.ReactElement {
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholder="Search assets..."
+          testID="asset-search"
         />
       </View>
 
       {/* Status Filter Chips */}
-      <FilterChips chips={STATUS_CHIPS} selected={statusFilter} onSelect={handleStatusFilter} />
+      <FilterChips
+        chips={STATUS_CHIPS}
+        selected={statusFilter}
+        onSelect={handleStatusFilter}
+        testID="asset-filter"
+      />
 
       {/* Results count */}
       <View style={styles.resultsHeader}>
@@ -150,6 +156,7 @@ export function AssetListScreen(): React.ReactElement {
         keyExtractor={keyExtractor}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={<EmptyState hasFilters={hasFilters} />}
+        testID="asset-list"
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}

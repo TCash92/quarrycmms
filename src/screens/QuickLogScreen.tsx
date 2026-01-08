@@ -106,7 +106,7 @@ export function QuickLogScreen(): React.ReactElement {
         >
           {/* Unenriched count badge */}
           {unenrichedCount > 0 && (
-            <View style={styles.unenrichedBadge}>
+            <View style={styles.unenrichedBadge} testID="quick-log-unenriched-badge">
               <Text style={styles.unenrichedText}>
                 {unenrichedCount} Quick Log{unenrichedCount !== 1 ? 's' : ''} need
                 {unenrichedCount === 1 ? 's' : ''} more detail
@@ -122,19 +122,29 @@ export function QuickLogScreen(): React.ReactElement {
               selectedId={assetId}
               onSelect={handleAssetSelect}
               isLoading={isLoadingRecent}
+              testID="quick-log-recent-assets"
             />
           </View>
 
           {/* Or Select Asset */}
           <View style={styles.section}>
             <SectionHeader title="Or Select Asset" />
-            <AssetPicker value={assetId} onChange={setAssetId} placeholder="Search all assets..." />
+            <AssetPicker
+              value={assetId}
+              onChange={setAssetId}
+              placeholder="Search all assets..."
+              testID="quick-log-asset-picker"
+            />
           </View>
 
           {/* What did you do? */}
           <View style={styles.section}>
             <SectionHeader title="What did you do?" />
-            <ActionTypePicker value={actionType} onChange={setActionType} />
+            <ActionTypePicker
+              value={actionType}
+              onChange={setActionType}
+              testID="quick-log-action"
+            />
           </View>
 
           {/* Quick Note */}
@@ -145,6 +155,7 @@ export function QuickLogScreen(): React.ReactElement {
               onChangeText={setNotes}
               placeholder="What happened? (100 chars max)"
               maxLength={100}
+              testID="quick-log-note-input"
             />
             <Text style={styles.charCount}>{notes.length}/100</Text>
           </View>
@@ -156,6 +167,7 @@ export function QuickLogScreen(): React.ReactElement {
             title={isSubmitting ? 'Saving...' : 'Log It'}
             onPress={handleSubmit}
             disabled={!isValid || isSubmitting}
+            testID="quick-log-submit-button"
           />
         </View>
       </KeyboardAvoidingView>

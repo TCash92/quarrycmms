@@ -104,7 +104,11 @@ export function WorkOrderListScreen(): React.ReactElement {
 
   const renderItem = useCallback(
     ({ item }: { item: WorkOrder }) => (
-      <WorkOrderCard workOrder={item} onPress={() => handleWorkOrderPress(item)} />
+      <WorkOrderCard
+        workOrder={item}
+        onPress={() => handleWorkOrderPress(item)}
+        testID="work-order-card"
+      />
     ),
     [handleWorkOrderPress]
   );
@@ -144,11 +148,17 @@ export function WorkOrderListScreen(): React.ReactElement {
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholder="Search work orders..."
+          testID="work-order-search"
         />
       </View>
 
       {/* Status Filter Chips */}
-      <FilterChips chips={statusChips} selected={statusFilter} onSelect={handleStatusFilter} />
+      <FilterChips
+        chips={statusChips}
+        selected={statusFilter}
+        onSelect={handleStatusFilter}
+        testID="work-order-filter"
+      />
 
       {/* Work Order List */}
       <FlatList
@@ -157,6 +167,7 @@ export function WorkOrderListScreen(): React.ReactElement {
         keyExtractor={keyExtractor}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={<EmptyState hasFilters={hasFilters} />}
+        testID="work-order-list"
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
@@ -181,6 +192,7 @@ export function WorkOrderListScreen(): React.ReactElement {
           activeOpacity={0.8}
           accessibilityRole="button"
           accessibilityLabel="Create new work order"
+          testID="work-order-create-button"
         >
           <Text style={styles.createButtonText}>+ Create Work Order</Text>
         </TouchableOpacity>

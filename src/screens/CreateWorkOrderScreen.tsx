@@ -106,7 +106,12 @@ export function CreateWorkOrderScreen(): React.ReactElement {
           {/* Asset Selection */}
           <View style={styles.field}>
             <FieldLabel label="Asset" required />
-            <AssetPicker value={assetId} onChange={setAssetId} placeholder="Select asset..." />
+            <AssetPicker
+              value={assetId}
+              onChange={setAssetId}
+              placeholder="Select asset..."
+              testID="create-wo-asset-picker"
+            />
           </View>
 
           {/* Title */}
@@ -117,6 +122,7 @@ export function CreateWorkOrderScreen(): React.ReactElement {
               onChangeText={setTitle}
               placeholder="Enter work order title"
               maxLength={100}
+              testID="create-wo-title-input"
             />
           </View>
 
@@ -130,13 +136,18 @@ export function CreateWorkOrderScreen(): React.ReactElement {
               multiline
               numberOfLines={4}
               inputStyle={styles.textArea}
+              testID="create-wo-description-input"
             />
           </View>
 
           {/* Priority */}
           <View style={styles.field}>
             <FieldLabel label="Priority" required />
-            <PriorityPicker value={priority} onChange={setPriority} />
+            <PriorityPicker
+              value={priority}
+              onChange={setPriority}
+              testID="create-wo-priority-picker"
+            />
           </View>
 
           {/* Info Text */}
@@ -154,6 +165,7 @@ export function CreateWorkOrderScreen(): React.ReactElement {
             title={isSubmitting ? 'Creating...' : 'Create Work Order'}
             onPress={handleSubmit}
             disabled={!isValid || isSubmitting}
+            testID="create-wo-submit-button"
           />
         </View>
       </KeyboardAvoidingView>

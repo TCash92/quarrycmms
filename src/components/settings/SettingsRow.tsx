@@ -30,6 +30,10 @@ interface SettingsRowProps {
   disabled?: boolean;
   /** Accessibility label override */
   accessibilityLabel?: string;
+  /** testID for E2E testing (applied to the row wrapper) */
+  testID?: string;
+  /** testID for the label text (for E2E testing) */
+  labelTestID?: string;
 }
 
 /**
@@ -44,6 +48,8 @@ export function SettingsRow({
   onPress,
   disabled = false,
   accessibilityLabel,
+  testID,
+  labelTestID,
 }: SettingsRowProps): React.ReactElement {
   const isDanger = variant === 'danger';
   const isInteractive = !!onPress && !disabled;
@@ -54,6 +60,7 @@ export function SettingsRow({
       <View style={styles.textContainer}>
         <Text
           style={[styles.label, isDanger && styles.labelDanger, disabled && styles.labelDisabled]}
+          testID={labelTestID}
         >
           {label}
         </Text>
@@ -75,13 +82,18 @@ export function SettingsRow({
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel || label}
         accessibilityState={{ disabled }}
+        testID={testID}
       >
         {content}
       </TouchableOpacity>
     );
   }
 
-  return <View style={styles.touchable}>{content}</View>;
+  return (
+    <View style={styles.touchable} testID={testID}>
+      {content}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
