@@ -501,11 +501,18 @@ async function applyWorkOrderChanges(
       // else: local has pending changes but no conflict (server hasn't changed) - skip, will push later
     } else {
       // Create new local record
+      // Resolve server asset UUID to local asset ID (assets are synced first)
+      const assetsCollection = database.get<Asset>('assets');
+      const localAssets = await assetsCollection
+        .query(Q.where('server_id', remote.asset_id))
+        .fetch();
+      const localAssetId = localAssets[0]?.id ?? remote.asset_id; // fallback to server ID if not found
+
       await woCollection.create(record => {
         record._raw.id = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         record.serverId = remote.id;
         record.siteId = remote.site_id;
-        record.assetId = remote.asset_id;
+        record.assetId = localAssetId;
         record.woNumber = remote.wo_number;
         record.title = remote.title;
         record.description = remote.description;
@@ -564,11 +571,18 @@ async function applyMeterReadingChanges(
 
         // Special handling: same_time_different_values - keep both records
         if (result.escalations.includes('same_time_different_values')) {
+          // Resolve server asset UUID to local asset ID
+          const assetsCollection = database.get<Asset>('assets');
+          const localAssets = await assetsCollection
+            .query(Q.where('server_id', remote.asset_id))
+            .fetch();
+          const localAssetId = localAssets[0]?.id ?? remote.asset_id;
+
           // Keep local as-is and create a new record for remote
           await mrCollection.create(record => {
             record._raw.id = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
             record.serverId = remote.id;
-            record.assetId = remote.asset_id;
+            record.assetId = localAssetId;
             record.readingValue = remote.reading_value;
             record.readingDate = new Date(remote.reading_date).getTime();
             record.recordedBy = remote.recorded_by;
@@ -656,10 +670,17 @@ async function applyMeterReadingChanges(
       // else: local has pending changes but no conflict (server hasn't changed) - skip, will push later
     } else {
       // Create new local record
+      // Resolve server asset UUID to local asset ID (assets are synced first)
+      const assetsCollection = database.get<Asset>('assets');
+      const localAssets = await assetsCollection
+        .query(Q.where('server_id', remote.asset_id))
+        .fetch();
+      const localAssetId = localAssets[0]?.id ?? remote.asset_id; // fallback to server ID if not found
+
       await mrCollection.create(record => {
         record._raw.id = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         record.serverId = remote.id;
-        record.assetId = remote.asset_id;
+        record.assetId = localAssetId;
         record.readingValue = remote.reading_value;
         record.readingDate = new Date(remote.reading_date).getTime();
         record.recordedBy = remote.recorded_by;
@@ -876,11 +897,30 @@ export async function pushChanges(): Promise<SyncResult> {
     // Push work orders (sorted by priority)
     for (const wo of sortedWorkOrders) {
       try {
+        // Resolve asset_id to server UUID
+        const assetsCollection = database.get<Asset>('assets');
+        const assets = await assetsCollection.query(Q.where('id', wo.assetId)).fetch();
+        const asset = assets[0];
+        if (!asset?.serverId) {
+          // Asset not synced yet - queue work order for retry
+          console.log(`[Sync] Work order ${wo.id} skipped - asset ${wo.assetId} not synced yet`);
+          await enqueue({
+            recordId: wo.id,
+            tableName: 'work_orders',
+            operation: 'push',
+            priority: calculateWorkOrderPriority({ priority: wo.priority, status: wo.status }),
+            maxAttempts: 5,
+          });
+          queuedForRetry++;
+          continue;
+        }
+        const resolvedAssetId = asset.serverId;
+
         const result = await upsertWorkOrder({
           ...(wo.serverId ? { id: wo.serverId } : {}),
           wo_number: wo.woNumber,
           site_id: wo.siteId,
-          asset_id: wo.assetId,
+          asset_id: resolvedAssetId,
           title: wo.title,
           description: wo.description,
           priority: wo.priority,
@@ -932,9 +972,28 @@ export async function pushChanges(): Promise<SyncResult> {
     // Push meter readings
     for (const mr of pendingMeterReadings) {
       try {
+        // Resolve asset_id to server UUID
+        const assetsCollection = database.get<Asset>('assets');
+        const assets = await assetsCollection.query(Q.where('id', mr.assetId)).fetch();
+        const asset = assets[0];
+        if (!asset?.serverId) {
+          // Asset not synced yet - queue meter reading for retry
+          console.log(`[Sync] Meter reading ${mr.id} skipped - asset ${mr.assetId} not synced yet`);
+          await enqueue({
+            recordId: mr.id,
+            tableName: 'meter_readings',
+            operation: 'push',
+            priority: getDefaultPriority('meter_readings'),
+            maxAttempts: 5,
+          });
+          queuedForRetry++;
+          continue;
+        }
+        const resolvedAssetId = asset.serverId;
+
         const result = await upsertMeterReading({
           ...(mr.serverId ? { id: mr.serverId } : {}),
-          asset_id: mr.assetId,
+          asset_id: resolvedAssetId,
           reading_value: mr.readingValue,
           reading_date: new Date(mr.readingDate).toISOString(),
           recorded_by: mr.recordedBy,
@@ -1134,11 +1193,19 @@ async function syncQueuedRecord(item: RetryQueueItem): Promise<void> {
         // Already synced by another process
         return;
       }
+      // Resolve asset_id to server UUID
+      const assetsCollection = database.get<Asset>('assets');
+      const assets = await assetsCollection.query(Q.where('id', wo.assetId)).fetch();
+      const asset = assets[0];
+      if (!asset?.serverId) {
+        throw new Error('Asset not synced yet');
+      }
+      const resolvedAssetId = asset.serverId;
       const result = await upsertWorkOrder({
         ...(wo.serverId ? { id: wo.serverId } : {}),
         wo_number: wo.woNumber,
         site_id: wo.siteId,
-        asset_id: wo.assetId,
+        asset_id: resolvedAssetId,
         title: wo.title,
         description: wo.description,
         priority: wo.priority,
@@ -1204,9 +1271,17 @@ async function syncQueuedRecord(item: RetryQueueItem): Promise<void> {
       if (mr.localSyncStatus !== 'pending') {
         return;
       }
+      // Resolve asset_id to server UUID
+      const assetsCollection = database.get<Asset>('assets');
+      const assets = await assetsCollection.query(Q.where('id', mr.assetId)).fetch();
+      const asset = assets[0];
+      if (!asset?.serverId) {
+        throw new Error('Asset not synced yet');
+      }
+      const resolvedAssetId = asset.serverId;
       const result = await upsertMeterReading({
         ...(mr.serverId ? { id: mr.serverId } : {}),
-        asset_id: mr.assetId,
+        asset_id: resolvedAssetId,
         reading_value: mr.readingValue,
         reading_date: new Date(mr.readingDate).toISOString(),
         recorded_by: mr.recordedBy,
