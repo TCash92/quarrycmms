@@ -501,11 +501,18 @@ async function applyWorkOrderChanges(
       // else: local has pending changes but no conflict (server hasn't changed) - skip, will push later
     } else {
       // Create new local record
+      // Resolve server asset UUID to local asset ID (assets are synced first)
+      const assetsCollection = database.get<Asset>('assets');
+      const localAssets = await assetsCollection
+        .query(Q.where('server_id', remote.asset_id))
+        .fetch();
+      const localAssetId = localAssets[0]?.id ?? remote.asset_id; // fallback to server ID if not found
+
       await woCollection.create(record => {
         record._raw.id = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         record.serverId = remote.id;
         record.siteId = remote.site_id;
-        record.assetId = remote.asset_id;
+        record.assetId = localAssetId;
         record.woNumber = remote.wo_number;
         record.title = remote.title;
         record.description = remote.description;
@@ -564,11 +571,18 @@ async function applyMeterReadingChanges(
 
         // Special handling: same_time_different_values - keep both records
         if (result.escalations.includes('same_time_different_values')) {
+          // Resolve server asset UUID to local asset ID
+          const assetsCollection = database.get<Asset>('assets');
+          const localAssets = await assetsCollection
+            .query(Q.where('server_id', remote.asset_id))
+            .fetch();
+          const localAssetId = localAssets[0]?.id ?? remote.asset_id;
+
           // Keep local as-is and create a new record for remote
           await mrCollection.create(record => {
             record._raw.id = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
             record.serverId = remote.id;
-            record.assetId = remote.asset_id;
+            record.assetId = localAssetId;
             record.readingValue = remote.reading_value;
             record.readingDate = new Date(remote.reading_date).getTime();
             record.recordedBy = remote.recorded_by;
@@ -656,10 +670,17 @@ async function applyMeterReadingChanges(
       // else: local has pending changes but no conflict (server hasn't changed) - skip, will push later
     } else {
       // Create new local record
+      // Resolve server asset UUID to local asset ID (assets are synced first)
+      const assetsCollection = database.get<Asset>('assets');
+      const localAssets = await assetsCollection
+        .query(Q.where('server_id', remote.asset_id))
+        .fetch();
+      const localAssetId = localAssets[0]?.id ?? remote.asset_id; // fallback to server ID if not found
+
       await mrCollection.create(record => {
         record._raw.id = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         record.serverId = remote.id;
-        record.assetId = remote.asset_id;
+        record.assetId = localAssetId;
         record.readingValue = remote.reading_value;
         record.readingDate = new Date(remote.reading_date).getTime();
         record.recordedBy = remote.recorded_by;
