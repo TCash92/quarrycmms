@@ -40,7 +40,10 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
       logger.debug('AuthProvider: Starting session restore', { category: 'auth' });
       try {
         const restored = await restoreSession();
-        logger.debug('AuthProvider: restoreSession returned', { category: 'auth', hasSession: !!restored });
+        logger.debug('AuthProvider: restoreSession returned', {
+          category: 'auth',
+          hasSession: !!restored,
+        });
         if (restored) {
           setAuthState({
             status: 'authenticated',

@@ -86,10 +86,8 @@ export type AssetsStackScreenProps<T extends keyof AssetsStackParamList> = Nativ
 /**
  * Type helper for work orders stack screens
  */
-export type WorkOrdersStackScreenProps<T extends keyof WorkOrdersStackParamList> = NativeStackScreenProps<
-  WorkOrdersStackParamList,
-  T
->;
+export type WorkOrdersStackScreenProps<T extends keyof WorkOrdersStackParamList> =
+  NativeStackScreenProps<WorkOrdersStackParamList, T>;
 
 /**
  * Global declaration for useNavigation hook typing

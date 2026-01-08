@@ -53,24 +53,14 @@ export function SettingsRow({
       {icon && <Text style={styles.icon}>{icon}</Text>}
       <View style={styles.textContainer}>
         <Text
-          style={[
-            styles.label,
-            isDanger && styles.labelDanger,
-            disabled && styles.labelDisabled,
-          ]}
+          style={[styles.label, isDanger && styles.labelDanger, disabled && styles.labelDisabled]}
         >
           {label}
         </Text>
-        {value && (
-          <Text style={[styles.value, disabled && styles.valueDisabled]}>
-            {value}
-          </Text>
-        )}
+        {value && <Text style={[styles.value, disabled && styles.valueDisabled]}>{value}</Text>}
       </View>
       {showChevron && isInteractive && (
-        <Text style={[styles.chevron, disabled && styles.chevronDisabled]}>
-          {'>'}
-        </Text>
+        <Text style={[styles.chevron, disabled && styles.chevronDisabled]}>{'>'}</Text>
       )}
     </View>
   );

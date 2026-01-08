@@ -8,13 +8,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  TextInput as RNTextInput,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, TextInput as RNTextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { useMeterReadings } from '@/hooks';
 import { TOUCH_TARGETS } from '@/constants';
 import type { MeterValidationResult } from '@/hooks/useMeterReadings';
@@ -63,14 +57,8 @@ export function MeterReadingInput({
   onSave,
   onValidation,
 }: MeterReadingInputProps): React.ReactElement {
-  const {
-    latestReading,
-    isLoading,
-    isSubmitting,
-    validateReading,
-    createReading,
-    error,
-  } = useMeterReadings(assetId);
+  const { latestReading, isLoading, isSubmitting, validateReading, createReading, error } =
+    useMeterReadings(assetId);
 
   const [value, setValue] = useState('');
   const [validation, setValidation] = useState<MeterValidationResult | null>(null);
@@ -123,17 +111,13 @@ export function MeterReadingInput({
       });
       setValue('');
       onSave?.(numValue);
-    } catch (err) {
+    } catch {
       // Error is handled by the hook
     }
   }, [value, assetId, validateReading, createReading, onSave]);
 
   const numValue = parseFloat(value.replace(/,/g, ''));
-  const canSave =
-    value.trim() !== '' &&
-    !isNaN(numValue) &&
-    validation?.isValid &&
-    !isSubmitting;
+  const canSave = value.trim() !== '' && !isNaN(numValue) && validation?.isValid && !isSubmitting;
 
   return (
     <View style={styles.container}>
@@ -181,12 +165,7 @@ export function MeterReadingInput({
           accessibilityLabel="Save meter reading"
           accessibilityState={{ disabled: !canSave }}
         >
-          <Text
-            style={[
-              styles.saveButtonText,
-              !canSave && styles.saveButtonTextDisabled,
-            ]}
-          >
+          <Text style={[styles.saveButtonText, !canSave && styles.saveButtonTextDisabled]}>
             {isSubmitting ? 'Saving...' : 'Save'}
           </Text>
         </TouchableOpacity>
@@ -196,12 +175,8 @@ export function MeterReadingInput({
       {latestReading && (
         <View style={styles.previousReading}>
           <Text style={styles.previousLabel}>Previous:</Text>
-          <Text style={styles.previousValue}>
-            {latestReading.readingValue.toLocaleString()}
-          </Text>
-          <Text style={styles.previousTime}>
-            ({formatRelativeTime(latestReading.readingDate)})
-          </Text>
+          <Text style={styles.previousValue}>{latestReading.readingValue.toLocaleString()}</Text>
+          <Text style={styles.previousTime}>({formatRelativeTime(latestReading.readingDate)})</Text>
         </View>
       )}
 

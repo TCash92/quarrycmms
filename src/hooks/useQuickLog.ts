@@ -51,7 +51,9 @@ function generateWoNumber(): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
-  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  const random = Math.floor(Math.random() * 10000)
+    .toString()
+    .padStart(4, '0');
   return `WO-${year}${month}${day}-${random}`;
 }
 
@@ -76,18 +78,15 @@ export function useQuickLog(): UseQuickLogReturn {
       Q.where('site_id', user.siteId),
       Q.where('is_quick_log', true),
       Q.where('needs_enrichment', true),
-      Q.or(
-        Q.where('created_by', user.id),
-        Q.where('assigned_to', user.id)
-      ),
+      Q.or(Q.where('created_by', user.id), Q.where('assigned_to', user.id)),
       Q.sortBy('local_updated_at', Q.desc)
     );
 
     const subscription = query.observe().subscribe({
-      next: (workOrders) => {
+      next: workOrders => {
         setUnenrichedLogs(workOrders);
       },
-      error: (err) => {
+      error: err => {
         console.error('[useQuickLog] Query error:', err);
         setUnenrichedLogs([]);
       },
@@ -114,7 +113,7 @@ export function useQuickLog(): UseQuickLogReturn {
         const asset = await assetsCollection.find(data.assetId);
 
         const workOrder = await database.write(async () => {
-          return await database.get<WorkOrder>('work_orders').create((wo) => {
+          return await database.get<WorkOrder>('work_orders').create(wo => {
             wo.woNumber = generateWoNumber();
             wo.siteId = user.siteId;
             wo.assetId = data.assetId;
@@ -146,7 +145,7 @@ export function useQuickLog(): UseQuickLogReturn {
       try {
         const workOrder = await database.get<WorkOrder>('work_orders').find(workOrderId);
         await database.write(async () => {
-          await workOrder.update((wo) => {
+          await workOrder.update(wo => {
             wo.needsEnrichment = false;
             wo.localSyncStatus = 'pending';
             wo.localUpdatedAt = Date.now();

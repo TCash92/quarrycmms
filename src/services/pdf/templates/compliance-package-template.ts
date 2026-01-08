@@ -18,12 +18,7 @@ import type Asset from '@/database/models/Asset';
 import type WorkOrder from '@/database/models/WorkOrder';
 import type MeterReading from '@/database/models/MeterReading';
 import { pdfStyles } from './styles';
-import {
-  formatDate,
-  formatTime,
-  formatDuration,
-  formatTimestamp,
-} from '../utils/image-utils';
+import { formatDate, formatTime, formatDuration, formatTimestamp } from '../utils/image-utils';
 import {
   type CompliancePackageData,
   calculateAssetDowntime,
@@ -98,10 +93,7 @@ function escapeHtml(text: string): string {
 /**
  * Generate HTML for the cover page section
  */
-function generateCoverPage(
-  data: CompliancePackageData,
-  packageHash: string
-): string {
+function generateCoverPage(data: CompliancePackageData, packageHash: string): string {
   const dateRangeText = formatDateRange(data.dateRange);
   const generatedText = `${formatDate(data.generatedAt.getTime())} at ${formatTime(data.generatedAt.getTime())}`;
 
@@ -171,7 +163,10 @@ function generateEquipmentCard(
   workOrders: WorkOrder[],
   meterReadings: MeterReading[]
 ): string {
-  const statusConfig = STATUS_CONFIG[asset.status] ?? { label: 'Operational', class: 'badge-operational' };
+  const statusConfig = STATUS_CONFIG[asset.status] ?? {
+    label: 'Operational',
+    class: 'badge-operational',
+  };
   const woCount = countAssetWorkOrders(asset.id, workOrders);
   const latestMeter = getLatestMeterReading(asset.id, meterReadings);
   const downtime = calculateAssetDowntime(asset.id, workOrders);
@@ -247,9 +242,7 @@ function generateEquipmentSummary(
       <p style="margin-bottom: 16px; color: #666;">
         ${assets.length} assets included in this compliance package.
       </p>
-      ${sortedAssets.map(asset =>
-        generateEquipmentCard(asset, workOrders, meterReadings)
-      ).join('')}
+      ${sortedAssets.map(asset => generateEquipmentCard(asset, workOrders, meterReadings)).join('')}
     </div>
   `;
 }
@@ -261,12 +254,12 @@ function generateEquipmentSummary(
 /**
  * Generate HTML for a single work order card
  */
-function generateWorkOrderCard(
-  workOrder: WorkOrder,
-  asset: Asset | undefined
-): string {
+function generateWorkOrderCard(workOrder: WorkOrder, asset: Asset | undefined): string {
   const statusConfig = WO_STATUS_CONFIG[workOrder.status] ?? { label: 'Open', class: 'badge-open' };
-  const priorityConfig = PRIORITY_CONFIG[workOrder.priority] ?? { label: 'Medium', class: 'badge-medium' };
+  const priorityConfig = PRIORITY_CONFIG[workOrder.priority] ?? {
+    label: 'Medium',
+    class: 'badge-medium',
+  };
 
   return `
     <div class="wo-card">
@@ -308,42 +301,62 @@ function generateWorkOrderCard(
           </div>
         </div>
 
-        ${workOrder.description ? `
+        ${
+          workOrder.description
+            ? `
           <div class="wo-card-notes">
             <strong>Description:</strong><br>
             ${escapeHtml(workOrder.description)}
           </div>
-        ` : ''}
+        `
+            : ''
+        }
 
-        ${workOrder.completionNotes ? `
+        ${
+          workOrder.completionNotes
+            ? `
           <div class="wo-card-notes">
             <strong>Work Performed:</strong><br>
             ${escapeHtml(workOrder.completionNotes)}
           </div>
-        ` : ''}
+        `
+            : ''
+        }
 
-        ${workOrder.signatureHash ? `
+        ${
+          workOrder.signatureHash
+            ? `
           <div class="wo-signature-section">
             <div class="verification-title" style="font-size: 11px;">Signature Verification</div>
             <div style="font-size: 10px; color: #666;">
-              ${workOrder.verificationCode ? `
+              ${
+                workOrder.verificationCode
+                  ? `
                 <div style="font-family: monospace; font-weight: 600; color: #1976D2; margin-bottom: 4px;">
                   ${workOrder.verificationCode}
                 </div>
-              ` : ''}
+              `
+                  : ''
+              }
               <div>Signed by: ${workOrder.completedBy || 'Unknown'}</div>
               <div>Timestamp: ${formatTimestamp(workOrder.signatureTimestamp)}</div>
               <div class="verification-hash" style="margin-top: 4px; font-size: 9px; word-break: break-all;">
                 SHA-256: ${workOrder.signatureHash}
               </div>
-              ${workOrder.verificationCode ? `
+              ${
+                workOrder.verificationCode
+                  ? `
                 <div style="margin-top: 4px; font-style: italic; font-size: 9px;">
                   Verify: verify.example.com/${workOrder.verificationCode}
                 </div>
-              ` : ''}
+              `
+                  : ''
+              }
             </div>
           </div>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
     </div>
   `;
@@ -352,10 +365,7 @@ function generateWorkOrderCard(
 /**
  * Generate HTML for the work order details section
  */
-function generateWorkOrderDetails(
-  workOrders: WorkOrder[],
-  assets: Asset[]
-): string {
+function generateWorkOrderDetails(workOrders: WorkOrder[], assets: Asset[]): string {
   if (workOrders.length === 0) {
     return `
       <div class="page-break-before">
@@ -383,9 +393,7 @@ function generateWorkOrderDetails(
       <p style="margin-bottom: 16px; color: #666;">
         ${workOrders.length} work orders in the selected date range.
       </p>
-      ${sortedOrders.map(wo =>
-        generateWorkOrderCard(wo, assetMap.get(wo.assetId))
-      ).join('')}
+      ${sortedOrders.map(wo => generateWorkOrderCard(wo, assetMap.get(wo.assetId))).join('')}
     </div>
   `;
 }
@@ -397,10 +405,7 @@ function generateWorkOrderDetails(
 /**
  * Generate HTML for meter readings for a single asset
  */
-function generateAssetMeterReadings(
-  asset: Asset,
-  meterReadings: MeterReading[]
-): string {
+function generateAssetMeterReadings(asset: Asset, meterReadings: MeterReading[]): string {
   const assetReadings = meterReadings
     .filter(mr => mr.assetId === asset.id)
     .sort((a, b) => (b.readingDate || 0) - (a.readingDate || 0));
@@ -430,31 +435,38 @@ function generateAssetMeterReadings(
           </tr>
         </thead>
         <tbody>
-          ${assetReadings.slice(0, 15).map((reading, index) => {
-            const prevReading = assetReadings[index + 1];
-            const change = prevReading
-              ? reading.readingValue - prevReading.readingValue
-              : 0;
-            const isHighChange = prevReading && change > (prevReading.readingValue * 0.5);
-            return `
+          ${assetReadings
+            .slice(0, 15)
+            .map((reading, index) => {
+              const prevReading = assetReadings[index + 1];
+              const change = prevReading ? reading.readingValue - prevReading.readingValue : 0;
+              const isHighChange = prevReading && change > prevReading.readingValue * 0.5;
+              return `
               <tr>
                 <td>${formatDate(reading.readingDate)}</td>
                 <td><strong>${reading.readingValue.toLocaleString()}</strong> ${asset.meterUnit || ''}</td>
                 <td>${reading.recordedBy || '--'}</td>
-                <td>${isHighChange
-                  ? '<span class="meter-flag meter-flag-high">High Change</span>'
-                  : '<span class="meter-flag meter-flag-normal">Normal</span>'}</td>
+                <td>${
+                  isHighChange
+                    ? '<span class="meter-flag meter-flag-high">High Change</span>'
+                    : '<span class="meter-flag meter-flag-normal">Normal</span>'
+                }</td>
                 <td>${reading.notes || '--'}</td>
               </tr>
             `;
-          }).join('')}
+            })
+            .join('')}
         </tbody>
       </table>
-      ${assetReadings.length > 15 ? `
+      ${
+        assetReadings.length > 15
+          ? `
         <div style="text-align: center; padding: 8px; color: #666; font-style: italic; font-size: 11px;">
           Showing 15 of ${assetReadings.length} readings
         </div>
-      ` : ''}
+      `
+          : ''
+      }
     </div>
   `;
 }
@@ -462,10 +474,7 @@ function generateAssetMeterReadings(
 /**
  * Generate HTML for the meter reading history section
  */
-function generateMeterReadingHistory(
-  assets: Asset[],
-  meterReadings: MeterReading[]
-): string {
+function generateMeterReadingHistory(assets: Asset[], meterReadings: MeterReading[]): string {
   // Filter assets with meters
   const assetsWithMeters = assets.filter(a => a.meterType);
 
@@ -486,9 +495,7 @@ function generateMeterReadingHistory(
       <p style="margin-bottom: 16px; color: #666;">
         ${meterReadings.length} meter readings across ${assetsWithMeters.length} assets.
       </p>
-      ${assetsWithMeters.map(asset =>
-        generateAssetMeterReadings(asset, meterReadings)
-      ).join('')}
+      ${assetsWithMeters.map(asset => generateAssetMeterReadings(asset, meterReadings)).join('')}
     </div>
   `;
 }
@@ -500,10 +507,7 @@ function generateMeterReadingHistory(
 /**
  * Generate HTML for the downtime summary section
  */
-function generateDowntimeSummary(
-  assets: Asset[],
-  workOrders: WorkOrder[]
-): string {
+function generateDowntimeSummary(assets: Asset[], workOrders: WorkOrder[]): string {
   const downtimeStats = calculateAllAssetDowntime(assets, workOrders);
 
   if (downtimeStats.length === 0) {
@@ -558,10 +562,11 @@ function generateDowntimeSummary(
           </tr>
         </thead>
         <tbody>
-          ${downtimeStats.map((stat, index) => {
-            const asset = assetMap.get(stat.assetId);
-            const isHighlight = index === 0;
-            return `
+          ${downtimeStats
+            .map((stat, index) => {
+              const asset = assetMap.get(stat.assetId);
+              const isHighlight = index === 0;
+              return `
               <tr class="${isHighlight ? 'downtime-highlight' : ''}">
                 <td>${asset ? `${asset.name} (${asset.assetNumber})` : stat.assetId}</td>
                 <td>${formatHours(stat.totalHours)}</td>
@@ -569,7 +574,8 @@ function generateDowntimeSummary(
                 <td>${formatHours(stat.longestEventHours)}</td>
               </tr>
             `;
-          }).join('')}
+            })
+            .join('')}
         </tbody>
       </table>
     </div>
@@ -583,10 +589,7 @@ function generateDowntimeSummary(
 /**
  * Generate HTML for the audit trail summary section
  */
-function generateAuditTrailSummary(
-  workOrders: WorkOrder[],
-  meterReadings: MeterReading[]
-): string {
+function generateAuditTrailSummary(workOrders: WorkOrder[], meterReadings: MeterReading[]): string {
   const audit = calculateAuditSummary(workOrders, meterReadings);
 
   return `
@@ -623,7 +626,9 @@ function generateAuditTrailSummary(
         </div>
       </div>
 
-      ${audit.syncConflictsEscalated > 0 ? `
+      ${
+        audit.syncConflictsEscalated > 0
+          ? `
         <div style="margin-top: 24px; padding: 16px; background: #FFF3E0; border-radius: 8px;">
           <div style="font-weight: 600; color: #E65100; margin-bottom: 8px;">
             Attention Required
@@ -633,7 +638,9 @@ function generateAuditTrailSummary(
             quick completion without notes. Please verify these records.
           </div>
         </div>
-      ` : ''}
+      `
+          : ''
+      }
     </div>
   `;
 }
@@ -645,10 +652,7 @@ function generateAuditTrailSummary(
 /**
  * Generate HTML for the certification section
  */
-function generateCertification(
-  data: CompliancePackageData,
-  packageHash: string
-): string {
+function generateCertification(data: CompliancePackageData, packageHash: string): string {
   const generatedText = `${formatDate(data.generatedAt.getTime())} at ${formatTime(data.generatedAt.getTime())}`;
 
   return `

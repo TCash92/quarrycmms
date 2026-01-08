@@ -64,10 +64,7 @@ export function RecentAssetsList({
 
     return (
       <TouchableOpacity
-        style={[
-          styles.assetCard,
-          isSelected && styles.assetCardSelected,
-        ]}
+        style={[styles.assetCard, isSelected && styles.assetCardSelected]}
         onPress={() => onSelect(item.id)}
         activeOpacity={0.8}
         accessibilityRole="radio"
@@ -77,10 +74,7 @@ export function RecentAssetsList({
         <Text style={[styles.assetNumber, isSelected && styles.textSelected]}>
           {item.assetNumber}
         </Text>
-        <Text
-          style={[styles.assetName, isSelected && styles.textSelected]}
-          numberOfLines={1}
-        >
+        <Text style={[styles.assetName, isSelected && styles.textSelected]} numberOfLines={1}>
           {item.name}
         </Text>
       </TouchableOpacity>
@@ -91,7 +85,7 @@ export function RecentAssetsList({
     <FlatList
       data={assets}
       renderItem={renderItem}
-      keyExtractor={(item) => item.id}
+      keyExtractor={item => item.id}
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.listContent}

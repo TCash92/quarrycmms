@@ -28,11 +28,7 @@ export type SyncOperation = 'push' | 'pull';
 /**
  * Record types that can be synced
  */
-export type SyncRecordType =
-  | 'work_orders'
-  | 'assets'
-  | 'meter_readings'
-  | 'work_order_photos';
+export type SyncRecordType = 'work_orders' | 'assets' | 'meter_readings' | 'work_order_photos';
 
 /**
  * Queue item state
@@ -212,7 +208,7 @@ export async function enqueue(params: EnqueueParams): Promise<string> {
 
   // Check if already queued
   const existing = queue.find(
-    (item) =>
+    item =>
       item.recordId === params.recordId &&
       item.tableName === params.tableName &&
       item.operation === params.operation &&
@@ -220,9 +216,7 @@ export async function enqueue(params: EnqueueParams): Promise<string> {
   );
 
   if (existing) {
-    console.log(
-      `[RetryQueue] Record ${params.recordId} already queued (${existing.state})`
-    );
+    console.log(`[RetryQueue] Record ${params.recordId} already queued (${existing.state})`);
     return existing.id;
   }
 
@@ -245,7 +239,7 @@ export async function enqueue(params: EnqueueParams): Promise<string> {
   if (queue.length > MAX_QUEUE_SIZE) {
     // Remove oldest completed/abandoned items first
     const pruned = queue
-      .filter((i) => i.state !== 'completed' && i.state !== 'abandoned')
+      .filter(i => i.state !== 'completed' && i.state !== 'abandoned')
       .slice(-MAX_QUEUE_SIZE);
     await saveQueue(pruned);
     console.log(`[RetryQueue] Pruned queue to ${pruned.length} items`);
@@ -271,7 +265,7 @@ export async function getRetryableItems(): Promise<RetryQueueItem[]> {
   const queue = await loadQueue();
   const now = Date.now();
 
-  const retryable = queue.filter((item) => {
+  const retryable = queue.filter(item => {
     // Only pending or failed items
     if (item.state !== 'pending' && item.state !== 'failed') {
       return false;
@@ -304,9 +298,7 @@ export async function getRetryableItems(): Promise<RetryQueueItem[]> {
  */
 export async function getPendingItems(): Promise<RetryQueueItem[]> {
   const queue = await loadQueue();
-  return queue.filter(
-    (item) => item.state === 'pending' || item.state === 'failed'
-  );
+  return queue.filter(item => item.state === 'pending' || item.state === 'failed');
 }
 
 /**
@@ -314,7 +306,7 @@ export async function getPendingItems(): Promise<RetryQueueItem[]> {
  */
 export async function getInProgressItems(): Promise<RetryQueueItem[]> {
   const queue = await loadQueue();
-  return queue.filter((item) => item.state === 'in_progress');
+  return queue.filter(item => item.state === 'in_progress');
 }
 
 /**
@@ -324,7 +316,7 @@ export async function getInProgressItems(): Promise<RetryQueueItem[]> {
  */
 export async function markInProgress(itemId: string): Promise<void> {
   const queue = await loadQueue();
-  const item = queue.find((i) => i.id === itemId);
+  const item = queue.find(i => i.id === itemId);
 
   if (!item) {
     console.warn(`[RetryQueue] Item ${itemId} not found`);
@@ -345,7 +337,7 @@ export async function markInProgress(itemId: string): Promise<void> {
  */
 export async function markCompleted(itemId: string): Promise<void> {
   const queue = await loadQueue();
-  const index = queue.findIndex((i) => i.id === itemId);
+  const index = queue.findIndex(i => i.id === itemId);
 
   if (index === -1) {
     console.warn(`[RetryQueue] Item ${itemId} not found`);
@@ -367,12 +359,9 @@ export async function markCompleted(itemId: string): Promise<void> {
  * @param itemId - Queue item ID
  * @param error - Classified error information
  */
-export async function markFailed(
-  itemId: string,
-  error: ClassifiedError
-): Promise<void> {
+export async function markFailed(itemId: string, error: ClassifiedError): Promise<void> {
   const queue = await loadQueue();
-  const item = queue.find((i) => i.id === itemId);
+  const item = queue.find(i => i.id === itemId);
 
   if (!item) {
     console.warn(`[RetryQueue] Item ${itemId} not found`);
@@ -384,9 +373,7 @@ export async function markFailed(
 
   if (item.attempts >= item.maxAttempts || !error.shouldRetry) {
     item.state = 'abandoned';
-    console.log(
-      `[RetryQueue] Abandoned item ${itemId} after ${item.attempts} attempts`
-    );
+    console.log(`[RetryQueue] Abandoned item ${itemId} after ${item.attempts} attempts`);
   } else {
     item.state = 'failed';
     item.nextRetryAt = getNextRetryTime(item.attempts);
@@ -404,12 +391,9 @@ export async function markFailed(
  * @param itemId - Queue item ID
  * @param reason - Reason for abandonment
  */
-export async function markAbandoned(
-  itemId: string,
-  reason: string
-): Promise<void> {
+export async function markAbandoned(itemId: string, reason: string): Promise<void> {
   const queue = await loadQueue();
-  const item = queue.find((i) => i.id === itemId);
+  const item = queue.find(i => i.id === itemId);
 
   if (!item) {
     console.warn(`[RetryQueue] Item ${itemId} not found`);
@@ -470,7 +454,7 @@ export async function findQueueItem(
   const queue = await loadQueue();
   return (
     queue.find(
-      (item) =>
+      item =>
         item.recordId === recordId &&
         item.tableName === tableName &&
         item.operation === operation &&
@@ -485,7 +469,7 @@ export async function findQueueItem(
  */
 export async function removeFromQueue(itemId: string): Promise<void> {
   const queue = await loadQueue();
-  const filtered = queue.filter((item) => item.id !== itemId);
+  const filtered = queue.filter(item => item.id !== itemId);
   await saveQueue(filtered);
 }
 
@@ -495,14 +479,12 @@ export async function removeFromQueue(itemId: string): Promise<void> {
  * @param olderThanMs - Remove items older than this (default: 24 hours)
  * @returns Number of items removed
  */
-export async function pruneQueue(
-  olderThanMs: number = 24 * 60 * 60 * 1000
-): Promise<number> {
+export async function pruneQueue(olderThanMs: number = 24 * 60 * 60 * 1000): Promise<number> {
   const queue = await loadQueue();
   const cutoff = Date.now() - olderThanMs;
   const before = queue.length;
 
-  const filtered = queue.filter((item) => {
+  const filtered = queue.filter(item => {
     // Keep pending and in-progress items
     if (item.state === 'pending' || item.state === 'in_progress') {
       return true;
@@ -621,7 +603,7 @@ export async function getRetryCount(): Promise<number> {
 export async function getBlockingIssues(): Promise<RetryQueueItem[]> {
   const queue = await loadQueue();
   return queue.filter(
-    (item) =>
+    item =>
       (item.state === 'failed' || item.state === 'abandoned') &&
       (item.errorCategory === 'auth' ||
         item.errorCategory === 'validation' ||

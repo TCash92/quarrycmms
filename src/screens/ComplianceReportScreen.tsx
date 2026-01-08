@@ -93,9 +93,7 @@ function PresetButton({
       accessibilityLabel={`Select ${label} date range`}
       accessibilityState={{ selected }}
     >
-      <Text
-        style={[styles.presetButtonText, selected && styles.presetButtonTextSelected]}
-      >
+      <Text style={[styles.presetButtonText, selected && styles.presetButtonTextSelected]}>
         {label}
       </Text>
     </TouchableOpacity>
@@ -106,8 +104,7 @@ function PresetButton({
  * Compliance Report Screen
  */
 export function ComplianceReportScreen(): React.ReactElement {
-  const { isGenerating, error, progress, exportCompliancePackage, clearError } =
-    usePdf();
+  const { isGenerating, error, progress, exportCompliancePackage, clearError } = usePdf();
 
   const [selectedPreset, setSelectedPreset] = useState<DatePreset>('30days');
   const dateRange = getDateRangeFromPreset(selectedPreset);
@@ -115,10 +112,13 @@ export function ComplianceReportScreen(): React.ReactElement {
   /**
    * Handle preset selection
    */
-  const handlePresetSelect = useCallback((preset: DatePreset) => {
-    setSelectedPreset(preset);
-    clearError();
-  }, [clearError]);
+  const handlePresetSelect = useCallback(
+    (preset: DatePreset) => {
+      setSelectedPreset(preset);
+      clearError();
+    },
+    [clearError]
+  );
 
   /**
    * Handle generate button press
@@ -233,9 +233,7 @@ export function ComplianceReportScreen(): React.ReactElement {
             <View style={styles.progressBar}>
               <View style={[styles.progressFill, { width: `${progress}%` }]} />
             </View>
-            <Text style={styles.progressText}>
-              Generating package... {progress}%
-            </Text>
+            <Text style={styles.progressText}>Generating package... {progress}%</Text>
           </View>
         )}
 

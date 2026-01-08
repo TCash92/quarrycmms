@@ -10,11 +10,7 @@
 import type WorkOrder from '@/database/models/WorkOrder';
 import type Asset from '@/database/models/Asset';
 import { pdfStyles } from './styles';
-import {
-  formatDate,
-  formatTime,
-  formatDuration,
-} from '../utils/image-utils';
+import { formatDate, formatTime, formatDuration } from '../utils/image-utils';
 
 /**
  * Priority display configuration
@@ -78,7 +74,10 @@ export interface SignatureData {
  * Generate HTML for the work order header section
  */
 function generateHeader(workOrder: WorkOrder): string {
-  const priorityConfig = PRIORITY_CONFIG[workOrder.priority] ?? { label: 'Medium', class: 'badge-medium' };
+  const priorityConfig = PRIORITY_CONFIG[workOrder.priority] ?? {
+    label: 'Medium',
+    class: 'badge-medium',
+  };
   const statusConfig = STATUS_CONFIG[workOrder.status] ?? { label: 'Open', class: 'badge-open' };
 
   return `
@@ -130,12 +129,16 @@ function generateAssetSection(asset: Asset | null): string {
           <span class="info-label">Location</span>
           <span class="info-value">${asset.locationDescription || '--'}</span>
         </div>
-        ${asset.meterType ? `
+        ${
+          asset.meterType
+            ? `
           <div class="info-row">
             <span class="info-label">${asset.meterType} Reading</span>
             <span class="info-value">${asset.meterCurrentReading?.toLocaleString() || '--'} ${asset.meterUnit || ''}</span>
           </div>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
     </div>
   `;
@@ -187,18 +190,26 @@ function generateDescriptionSection(workOrder: WorkOrder): string {
   }
 
   return `
-    ${workOrder.description ? `
+    ${
+      workOrder.description
+        ? `
       <div class="section">
         <div class="section-title">Problem Description</div>
         <div class="description-text">${escapeHtml(workOrder.description)}</div>
       </div>
-    ` : ''}
-    ${workOrder.completionNotes ? `
+    `
+        : ''
+    }
+    ${
+      workOrder.completionNotes
+        ? `
       <div class="section">
         <div class="section-title">Work Performed</div>
         <div class="description-text">${escapeHtml(workOrder.completionNotes)}</div>
       </div>
-    ` : ''}
+    `
+        : ''
+    }
   `;
 }
 
@@ -216,17 +227,21 @@ function generateSignatureSection(workOrder: WorkOrder, signature: SignatureData
     <div class="signature-section">
       <div class="section-title" style="border: none; margin-bottom: 16px;">Signature</div>
 
-      ${hasSignature ? `
+      ${
+        hasSignature
+          ? `
         <img
           src="${signature.imageBase64}"
           alt="Signature"
           class="signature-image"
         />
-      ` : `
+      `
+          : `
         <div class="description-text" style="text-align: center; color: #999;">
           No signature captured
         </div>
-      `}
+      `
+      }
 
       <div class="signature-info">
         <div><strong>Signed by:</strong> ${signature?.signedBy || workOrder.completedBy || 'Unknown'}</div>
@@ -252,7 +267,9 @@ function generateVerificationSection(signature: SignatureData): string {
         Signature Verification
       </div>
 
-      ${signature.verificationCode ? `
+      ${
+        signature.verificationCode
+          ? `
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
           <div style="flex: 1;">
             <div style="font-size: 12px; color: #666; margin-bottom: 4px;">Verification Code</div>
@@ -260,14 +277,20 @@ function generateVerificationSection(signature: SignatureData): string {
               ${signature.verificationCode}
             </div>
           </div>
-          ${signature.qrCodeBase64 ? `
+          ${
+            signature.qrCodeBase64
+              ? `
             <div style="margin-left: 16px;">
               <img src="${signature.qrCodeBase64}" alt="Verification QR Code" style="width: 80px; height: 80px;" />
               <div style="font-size: 9px; color: #999; text-align: center; margin-top: 4px;">Scan to verify</div>
             </div>
-          ` : ''}
+          `
+              : ''
+          }
         </div>
-      ` : ''}
+      `
+          : ''
+      }
 
       <div style="margin-bottom: 16px;">
         <div style="font-size: 12px; color: #666; margin-bottom: 4px;">SHA-256 Hash</div>
@@ -276,7 +299,9 @@ function generateVerificationSection(signature: SignatureData): string {
         </div>
       </div>
 
-      ${fields ? `
+      ${
+        fields
+          ? `
         <div style="margin-bottom: 16px;">
           <div style="font-size: 12px; font-weight: 600; color: #666; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 4px;">
             Signed Fields at Time of Signing
@@ -307,7 +332,9 @@ function generateVerificationSection(signature: SignatureData): string {
             <div>${fields.meter_reading_at_completion > 0 ? fields.meter_reading_at_completion.toLocaleString() : '(none)'}</div>
           </div>
         </div>
-      ` : ''}
+      `
+          : ''
+      }
 
       <div style="font-size: 10px; color: #666; border-top: 1px solid #ddd; padding-top: 12px;">
         <div style="font-weight: 600; margin-bottom: 4px;">Offline Verification Instructions:</div>
@@ -319,11 +346,15 @@ function generateVerificationSection(signature: SignatureData): string {
         </ol>
       </div>
 
-      ${signature.verificationCode ? `
+      ${
+        signature.verificationCode
+          ? `
         <div style="font-size: 10px; color: #666; margin-top: 12px; text-align: center;">
           Online verification: <span style="font-family: monospace; color: #1976D2;">verify.example.com/${signature.verificationCode}</span>
         </div>
-      ` : ''}
+      `
+          : ''
+      }
     </div>
   `;
 }

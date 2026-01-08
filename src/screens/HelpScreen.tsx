@@ -48,7 +48,7 @@ const WORK_ORDER_STEPS = [
  * Sync status explanations
  */
 const SYNC_STATUS_INFO = [
-  { icon: '', text: 'Green - All synced, you\'re good!' },
+  { icon: '', text: "Green - All synced, you're good!" },
   { icon: '', text: 'Yellow - Syncing in progress or pending changes' },
   { icon: '', text: 'Orange - Offline mode, data saved locally' },
   { icon: '', text: 'Red - Error, tap for details and solutions' },
@@ -80,18 +80,14 @@ export function HelpScreen(): React.ReactElement {
       if (supported) {
         await Linking.openURL(mailtoUrl);
       } else {
-        Alert.alert(
-          'Contact Support',
-          `Email us at ${SUPPORT_EMAIL} for assistance.`,
-          [{ text: 'OK' }]
-        );
+        Alert.alert('Contact Support', `Email us at ${SUPPORT_EMAIL} for assistance.`, [
+          { text: 'OK' },
+        ]);
       }
     } catch {
-      Alert.alert(
-        'Contact Support',
-        `Email us at ${SUPPORT_EMAIL} for assistance.`,
-        [{ text: 'OK' }]
-      );
+      Alert.alert('Contact Support', `Email us at ${SUPPORT_EMAIL} for assistance.`, [
+        { text: 'OK' },
+      ]);
     }
   }, []);
 
@@ -207,7 +203,8 @@ export function HelpScreen(): React.ReactElement {
               {SUPPORT_EMAIL}
             </Text>
             <Text style={styles.contactHint}>
-              For faster support, export your diagnostic logs from Settings and include them in your email.
+              For faster support, export your diagnostic logs from Settings and include them in your
+              email.
             </Text>
           </View>
         </HelpSection>

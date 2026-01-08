@@ -30,11 +30,7 @@ export {
   getLocalStorageUsage,
 } from './database-reset';
 
-export type {
-  ResetOptions,
-  ResetResult,
-  ResetSafetyCheck,
-} from './database-reset';
+export type { ResetOptions, ResetResult, ResetSafetyCheck } from './database-reset';
 
 // Device migration
 export {

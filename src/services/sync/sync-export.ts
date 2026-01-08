@@ -270,13 +270,16 @@ export async function shareExportedLogs(
 /**
  * Get list of available export files
  */
-export async function getExportFiles(): Promise<Array<{ fileName: string; filePath: string; size: number; createdAt: number }>> {
+export async function getExportFiles(): Promise<
+  Array<{ fileName: string; filePath: string; size: number; createdAt: number }>
+> {
   try {
     const info = await FileSystem.getInfoAsync(EXPORT_DIRECTORY);
     if (!info.exists) return [];
 
     const files = await FileSystem.readDirectoryAsync(EXPORT_DIRECTORY);
-    const exports: Array<{ fileName: string; filePath: string; size: number; createdAt: number }> = [];
+    const exports: Array<{ fileName: string; filePath: string; size: number; createdAt: number }> =
+      [];
 
     for (const file of files) {
       if (file.endsWith('.json')) {

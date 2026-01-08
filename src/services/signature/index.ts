@@ -8,7 +8,15 @@
  */
 
 // Crypto utilities
-export { sha256, sha256Binary, hexToBytes, bytesToHex, bytesToBase64, base64ToBytes, randomHex } from './crypto-utils';
+export {
+  sha256,
+  sha256Binary,
+  hexToBytes,
+  bytesToHex,
+  bytesToBase64,
+  base64ToBytes,
+  randomHex,
+} from './crypto-utils';
 
 // Signature service
 export {

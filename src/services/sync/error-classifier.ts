@@ -113,11 +113,7 @@ export function isNetworkError(error: unknown): boolean {
   if (!error) return false;
 
   const message =
-    error instanceof Error
-      ? error.message
-      : typeof error === 'string'
-        ? error
-        : String(error);
+    error instanceof Error ? error.message : typeof error === 'string' ? error : String(error);
 
   const networkPatterns = [
     /network\s*(error|failed|unavailable)/i,
@@ -133,7 +129,7 @@ export function isNetworkError(error: unknown): boolean {
     /unable\s*to\s*resolve\s*host/i,
   ];
 
-  return networkPatterns.some((pattern) => pattern.test(message));
+  return networkPatterns.some(pattern => pattern.test(message));
 }
 
 /**
@@ -149,11 +145,7 @@ export function isRateLimitError(error: unknown): boolean {
   if (!error) return false;
 
   const message =
-    error instanceof Error
-      ? error.message
-      : typeof error === 'string'
-        ? error
-        : String(error);
+    error instanceof Error ? error.message : typeof error === 'string' ? error : String(error);
 
   const rateLimitPatterns = [
     /rate\s*limit/i,
@@ -162,7 +154,7 @@ export function isRateLimitError(error: unknown): boolean {
     /throttl/i,
   ];
 
-  return rateLimitPatterns.some((pattern) => pattern.test(message));
+  return rateLimitPatterns.some(pattern => pattern.test(message));
 }
 
 /**
@@ -178,11 +170,7 @@ export function isAuthError(error: unknown): boolean {
   if (!error) return false;
 
   const message =
-    error instanceof Error
-      ? error.message
-      : typeof error === 'string'
-        ? error
-        : String(error);
+    error instanceof Error ? error.message : typeof error === 'string' ? error : String(error);
 
   const authPatterns = [
     /unauthorized/i,
@@ -195,7 +183,7 @@ export function isAuthError(error: unknown): boolean {
     /not\s*logged\s*in/i,
   ];
 
-  return authPatterns.some((pattern) => pattern.test(message));
+  return authPatterns.some(pattern => pattern.test(message));
 }
 
 /**
@@ -211,11 +199,7 @@ export function isValidationError(error: unknown): boolean {
   if (!error) return false;
 
   const message =
-    error instanceof Error
-      ? error.message
-      : typeof error === 'string'
-        ? error
-        : String(error);
+    error instanceof Error ? error.message : typeof error === 'string' ? error : String(error);
 
   const validationPatterns = [
     /validation\s*(error|failed)/i,
@@ -227,7 +211,7 @@ export function isValidationError(error: unknown): boolean {
     /bad\s*request/i,
   ];
 
-  return validationPatterns.some((pattern) => pattern.test(message));
+  return validationPatterns.some(pattern => pattern.test(message));
 }
 
 /**
@@ -243,15 +227,11 @@ export function isTimeoutError(error: unknown): boolean {
   if (!error) return false;
 
   const message =
-    error instanceof Error
-      ? error.message
-      : typeof error === 'string'
-        ? error
-        : String(error);
+    error instanceof Error ? error.message : typeof error === 'string' ? error : String(error);
 
   const timeoutPatterns = [/timeout/i, /timed\s*out/i, /ETIMEDOUT/i];
 
-  return timeoutPatterns.some((pattern) => pattern.test(message));
+  return timeoutPatterns.some(pattern => pattern.test(message));
 }
 
 /**

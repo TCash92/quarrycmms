@@ -253,7 +253,10 @@ export async function generateCompliancePackagePdf(
  * @param maxAgeMs - Maximum age in milliseconds (default: 7 days)
  */
 export async function cleanupOldPdfs(maxAgeMs = 7 * 24 * 60 * 60 * 1000): Promise<void> {
-  logger.debug('Cleaning up old PDFs', { category: 'pdf', maxAgeDays: maxAgeMs / (24 * 60 * 60 * 1000) });
+  logger.debug('Cleaning up old PDFs', {
+    category: 'pdf',
+    maxAgeDays: maxAgeMs / (24 * 60 * 60 * 1000),
+  });
 
   try {
     const docDir = documentDirectory;

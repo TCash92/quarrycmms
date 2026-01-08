@@ -9,14 +9,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { Button } from '@/components/ui';
@@ -156,10 +149,7 @@ export function DeviceMigrationScreen(): React.ReactElement {
               <View style={styles.timerContainer}>
                 <Text style={styles.timerLabel}>Expires in:</Text>
                 <Text
-                  style={[
-                    styles.timerValue,
-                    timeRemaining === 'Expired' && styles.timerExpired,
-                  ]}
+                  style={[styles.timerValue, timeRemaining === 'Expired' && styles.timerExpired]}
                 >
                   {timeRemaining}
                 </Text>
@@ -182,9 +172,7 @@ export function DeviceMigrationScreen(): React.ReactElement {
             <Text style={styles.instructionsTitle}>How to transfer:</Text>
             <View style={styles.step}>
               <Text style={styles.stepNumber}>1</Text>
-              <Text style={styles.stepText}>
-                On your new device, download and open QuarryCMMS
-              </Text>
+              <Text style={styles.stepText}>On your new device, download and open QuarryCMMS</Text>
             </View>
             <View style={styles.step}>
               <Text style={styles.stepNumber}>2</Text>
@@ -194,15 +182,11 @@ export function DeviceMigrationScreen(): React.ReactElement {
             </View>
             <View style={styles.step}>
               <Text style={styles.stepNumber}>3</Text>
-              <Text style={styles.stepText}>
-                Scan this QR code with the new device
-              </Text>
+              <Text style={styles.stepText}>Scan this QR code with the new device</Text>
             </View>
             <View style={styles.step}>
               <Text style={styles.stepNumber}>4</Text>
-              <Text style={styles.stepText}>
-                Log in with your credentials on the new device
-              </Text>
+              <Text style={styles.stepText}>Log in with your credentials on the new device</Text>
             </View>
           </View>
 
@@ -242,20 +226,14 @@ export function DeviceMigrationScreen(): React.ReactElement {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Transfer from Another Device</Text>
-          <Text style={styles.description}>
-            Scan the QR code displayed on your old device.
-          </Text>
+          <Text style={styles.description}>Scan the QR code displayed on your old device.</Text>
         </View>
 
         {/* Placeholder for camera/scanner */}
         <View style={styles.scannerPlaceholder}>
           <View style={styles.scannerFrame}>
-            <Text style={styles.scannerPlaceholderText}>
-              Camera permission required
-            </Text>
-            <Text style={styles.scannerPlaceholderSubtext}>
-              QR scanner will appear here
-            </Text>
+            <Text style={styles.scannerPlaceholderText}>Camera permission required</Text>
+            <Text style={styles.scannerPlaceholderSubtext}>QR scanner will appear here</Text>
           </View>
         </View>
 
@@ -264,35 +242,25 @@ export function DeviceMigrationScreen(): React.ReactElement {
           <Text style={styles.instructionsTitle}>Instructions:</Text>
           <View style={styles.step}>
             <Text style={styles.stepNumber}>1</Text>
-            <Text style={styles.stepText}>
-              Open Settings on your old device
-            </Text>
+            <Text style={styles.stepText}>Open Settings on your old device</Text>
           </View>
           <View style={styles.step}>
             <Text style={styles.stepNumber}>2</Text>
-            <Text style={styles.stepText}>
-              Tap "Transfer to New Device"
-            </Text>
+            <Text style={styles.stepText}>Tap "Transfer to New Device"</Text>
           </View>
           <View style={styles.step}>
             <Text style={styles.stepNumber}>3</Text>
-            <Text style={styles.stepText}>
-              Point this camera at the QR code
-            </Text>
+            <Text style={styles.stepText}>Point this camera at the QR code</Text>
           </View>
           <View style={styles.step}>
             <Text style={styles.stepNumber}>4</Text>
-            <Text style={styles.stepText}>
-              Log in with your credentials
-            </Text>
+            <Text style={styles.stepText}>Log in with your credentials</Text>
           </View>
         </View>
 
         {/* Alternative login */}
         <View style={styles.alternativeSection}>
-          <Text style={styles.alternativeText}>
-            Don&apos;t have your old device?
-          </Text>
+          <Text style={styles.alternativeText}>Don&apos;t have your old device?</Text>
           <Button
             title="Log in Manually"
             variant="secondary"

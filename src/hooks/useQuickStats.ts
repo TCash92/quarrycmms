@@ -109,11 +109,11 @@ export function useQuickStats(): UseQuickStatsReturn {
 
     // Subscribe to work orders
     const woSubscription = woQuery.observe().subscribe({
-      next: (wos) => {
+      next: wos => {
         setWorkOrders(wos);
         setIsLoading(false);
       },
-      error: (err) => {
+      error: err => {
         console.error('[useQuickStats] Work order query error:', err);
         setIsLoading(false);
       },
@@ -121,10 +121,10 @@ export function useQuickStats(): UseQuickStatsReturn {
 
     // Subscribe to asset count
     const assetSubscription = assetQuery.observeCount().subscribe({
-      next: (count) => {
+      next: count => {
         setAssetCount(count);
       },
-      error: (err) => {
+      error: err => {
         console.error('[useQuickStats] Asset count error:', err);
       },
     });
@@ -144,10 +144,10 @@ export function useQuickStats(): UseQuickStatsReturn {
     const openWorkOrders = workOrders.length;
 
     // My assigned = assigned to current user
-    const myAssigned = workOrders.filter((wo) => wo.assignedTo === user.id).length;
+    const myAssigned = workOrders.filter(wo => wo.assignedTo === user.id).length;
 
     // Due today = due date falls within today
-    const dueToday = workOrders.filter((wo) => {
+    const dueToday = workOrders.filter(wo => {
       if (!wo.dueDate) return false;
       return wo.dueDate >= todayStart && wo.dueDate <= todayEnd;
     }).length;
@@ -162,7 +162,7 @@ export function useQuickStats(): UseQuickStatsReturn {
 
   // Force refresh
   const refreshStats = () => {
-    setRefreshKey((k) => k + 1);
+    setRefreshKey(k => k + 1);
   };
 
   return {

@@ -57,15 +57,14 @@ export function useRecentAssets(): UseRecentAssetsReturn {
         const assetsCollection = database.get<Asset>('assets');
 
         // Get recent work orders for this user (created by or assigned to)
-        const recentWorkOrders = await workOrdersCollection.query(
-          Q.where('site_id', user.siteId),
-          Q.or(
-            Q.where('created_by', user.id),
-            Q.where('assigned_to', user.id)
-          ),
-          Q.sortBy('local_updated_at', Q.desc),
-          Q.take(MAX_WORK_ORDERS)
-        ).fetch();
+        const recentWorkOrders = await workOrdersCollection
+          .query(
+            Q.where('site_id', user.siteId),
+            Q.or(Q.where('created_by', user.id), Q.where('assigned_to', user.id)),
+            Q.sortBy('local_updated_at', Q.desc),
+            Q.take(MAX_WORK_ORDERS)
+          )
+          .fetch();
 
         // Extract unique asset IDs, preserving order (most recent first)
         const seenAssetIds = new Set<string>();
@@ -112,7 +111,7 @@ export function useRecentAssets(): UseRecentAssetsReturn {
   }, [database, user.siteId, user.id, refreshKey]);
 
   const refresh = useCallback(() => {
-    setRefreshKey((k) => k + 1);
+    setRefreshKey(k => k + 1);
   }, []);
 
   return {

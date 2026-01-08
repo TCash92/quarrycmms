@@ -253,7 +253,7 @@ export async function collectDiagnostics(): Promise<DeviceDiagnostics> {
     isInternetReachable: networkState.isInternetReachable,
     cellularGeneration:
       networkState.type === 'cellular'
-        ? (networkState.details as { cellularGeneration?: string })?.cellularGeneration ?? null
+        ? ((networkState.details as { cellularGeneration?: string })?.cellularGeneration ?? null)
         : null,
 
     // Sync state

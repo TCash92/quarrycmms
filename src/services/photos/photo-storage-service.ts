@@ -72,10 +72,7 @@ function base64ToArrayBuffer(base64: string): Uint8Array {
  * @param storagePath - Target path in Storage bucket
  * @returns Upload result with remote URL on success
  */
-export async function uploadPhotoFile(
-  photoId: string,
-  storagePath: string
-): Promise<UploadResult> {
+export async function uploadPhotoFile(photoId: string, storagePath: string): Promise<UploadResult> {
   try {
     const supabase = getSupabaseClient();
 
@@ -96,14 +93,12 @@ export async function uploadPhotoFile(
 
     console.log(`[PhotoStorage] Uploading photo ${photoId} to ${storagePath}`);
 
-    const { data, error } = await supabase.storage.from(config.storageBucket).upload(
-      storagePath,
-      arrayBuffer,
-      {
+    const { data, error } = await supabase.storage
+      .from(config.storageBucket)
+      .upload(storagePath, arrayBuffer, {
         contentType: 'image/jpeg',
         upsert: false, // Don't overwrite existing files
-      }
-    );
+      });
 
     if (error) {
       // Check if file already exists (duplicate upload)
@@ -175,14 +170,12 @@ export async function uploadPhotoFromUri(
 
     console.log(`[PhotoStorage] Uploading from URI to ${storagePath}`);
 
-    const { data, error } = await supabase.storage.from(config.storageBucket).upload(
-      storagePath,
-      arrayBuffer,
-      {
+    const { data, error } = await supabase.storage
+      .from(config.storageBucket)
+      .upload(storagePath, arrayBuffer, {
         contentType: 'image/jpeg',
         upsert: false,
-      }
-    );
+      });
 
     if (error) {
       if (error.message?.includes('already exists')) {

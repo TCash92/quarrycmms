@@ -36,11 +36,7 @@ import {
 } from './conflict-resolver';
 import { logConflict, pruneConflictLogs } from './conflict-log';
 import WorkOrderPhoto from '@/database/models/WorkOrderPhoto';
-import {
-  syncPhotos,
-  getPendingPhotoUploadCount,
-  PhotoSyncResult,
-} from './photo-sync';
+import { syncPhotos, getPendingPhotoUploadCount, PhotoSyncResult } from './photo-sync';
 import { classifyError } from './error-classifier';
 import {
   enqueue,
@@ -772,9 +768,7 @@ async function applyWorkOrderPhotoChanges(
     } else {
       // No conflicts - just sync new photos from server
       for (const remotePhoto of remoteWoPhotos) {
-        const existing = await photoCollection
-          .query(Q.where('server_id', remotePhoto.id))
-          .fetch();
+        const existing = await photoCollection.query(Q.where('server_id', remotePhoto.id)).fetch();
 
         if (existing.length === 0) {
           // Create new local record
@@ -1022,7 +1016,9 @@ export async function pushChanges(): Promise<SyncResult> {
       }
     }
 
-    console.log(`[Sync] pushChanges() completed: ${pushed} pushed, ${queuedForRetry} queued for retry`);
+    console.log(
+      `[Sync] pushChanges() completed: ${pushed} pushed, ${queuedForRetry} queued for retry`
+    );
 
     return {
       success: true,
@@ -1117,7 +1113,10 @@ async function processRetryQueue(): Promise<{ retried: number; retriedFailed: nu
       const classified = classifyError(error);
       await markFailed(item.id, classified);
       retriedFailed++;
-      console.error(`[Sync] Retry failed for ${item.tableName}/${item.recordId}:`, classified.userMessage);
+      console.error(
+        `[Sync] Retry failed for ${item.tableName}/${item.recordId}:`,
+        classified.userMessage
+      );
     }
   }
 

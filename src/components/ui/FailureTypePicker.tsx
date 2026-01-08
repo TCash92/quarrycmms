@@ -23,23 +23,17 @@ const FAILURE_TYPE_OPTIONS: FailureType[] = ['none', 'wore_out', 'broke', 'unkno
  * Failure type selection component for work order completion
  * Displays failure type options as tappable chips
  */
-export function FailureTypePicker({
-  value,
-  onChange,
-}: FailureTypePickerProps): React.ReactElement {
+export function FailureTypePicker({ value, onChange }: FailureTypePickerProps): React.ReactElement {
   return (
     <View style={styles.container}>
-      {FAILURE_TYPE_OPTIONS.map((failureType) => {
+      {FAILURE_TYPE_OPTIONS.map(failureType => {
         const isSelected = failureType === value;
         const config = FAILURE_TYPES[failureType];
 
         return (
           <TouchableOpacity
             key={failureType}
-            style={[
-              styles.chip,
-              isSelected && { backgroundColor: config.color },
-            ]}
+            style={[styles.chip, isSelected && { backgroundColor: config.color }]}
             onPress={() => onChange(failureType)}
             accessibilityRole="radio"
             accessibilityState={{ selected: isSelected }}

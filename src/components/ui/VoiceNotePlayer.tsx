@@ -8,13 +8,7 @@
  */
 
 import React, { useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useVoiceNote } from '@/hooks';
 import { TOUCH_TARGETS } from '@/constants';
 
@@ -79,9 +73,7 @@ export function VoiceNotePlayer({
   // Show error alert
   useEffect(() => {
     if (error) {
-      Alert.alert('Playback Error', error, [
-        { text: 'OK', onPress: clearError },
-      ]);
+      Alert.alert('Playback Error', error, [{ text: 'OK', onPress: clearError }]);
     }
   }, [error, clearError]);
 
@@ -99,27 +91,26 @@ export function VoiceNotePlayer({
   }, [isPlaying, playbackPosition, playbackDuration, uri, pause, resume, loadAndPlay]);
 
   // Handle rate change
-  const handleRateChange = useCallback(async (rate: number) => {
-    await setRate(rate);
-  }, [setRate]);
+  const handleRateChange = useCallback(
+    async (rate: number) => {
+      await setRate(rate);
+    },
+    [setRate]
+  );
 
   // Handle delete
   const handleDelete = useCallback(() => {
-    Alert.alert(
-      'Delete Voice Note',
-      'Are you sure you want to delete this voice note?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            stop();
-            onDelete?.();
-          },
+    Alert.alert('Delete Voice Note', 'Are you sure you want to delete this voice note?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          stop();
+          onDelete?.();
         },
-      ]
-    );
+      },
+    ]);
   }, [stop, onDelete]);
 
   // Calculate progress percentage
@@ -152,9 +143,7 @@ export function VoiceNotePlayer({
           {/* Progress Bar */}
           <View style={styles.progressBarContainer}>
             <View style={styles.progressBarBackground}>
-              <View
-                style={[styles.progressBarFill, { width: `${progress}%` }]}
-              />
+              <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
             </View>
           </View>
 
@@ -170,13 +159,10 @@ export function VoiceNotePlayer({
       <View style={styles.speedRow}>
         <Text style={styles.speedLabel}>Speed:</Text>
         <View style={styles.speedButtons}>
-          {PLAYBACK_RATES.map((rate) => (
+          {PLAYBACK_RATES.map(rate => (
             <TouchableOpacity
               key={rate}
-              style={[
-                styles.speedButton,
-                playbackRate === rate && styles.speedButtonActive,
-              ]}
+              style={[styles.speedButton, playbackRate === rate && styles.speedButtonActive]}
               onPress={() => handleRateChange(rate)}
               accessibilityRole="button"
               accessibilityLabel={`${rate}x speed`}

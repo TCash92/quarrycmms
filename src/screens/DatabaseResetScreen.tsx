@@ -181,8 +181,8 @@ export function DatabaseResetScreen(): React.ReactElement {
           <Text style={styles.warningIcon}>!</Text>
           <Text style={styles.warningTitle}>Reset Local Database</Text>
           <Text style={styles.warningDescription}>
-            This will permanently delete all local data on this device. Data that has been synced
-            to the server will be downloaded again.
+            This will permanently delete all local data on this device. Data that has been synced to
+            the server will be downloaded again.
           </Text>
         </View>
 
@@ -236,8 +236,7 @@ export function DatabaseResetScreen(): React.ReactElement {
           <View style={styles.safeSection}>
             <Text style={styles.safeTitle}>All Data Synced</Text>
             <Text style={styles.safeDescription}>
-              All your data has been synced to the server. You can safely reset the local
-              database.
+              All your data has been synced to the server. You can safely reset the local database.
             </Text>
           </View>
         )}

@@ -45,7 +45,10 @@ const PRIORITY_LABELS: Record<string, string> = {
  * Generate HTML for the asset header section
  */
 function generateHeader(asset: Asset): string {
-  const statusConfig = STATUS_CONFIG[asset.status] ?? { label: 'Operational', class: 'badge-operational' };
+  const statusConfig = STATUS_CONFIG[asset.status] ?? {
+    label: 'Operational',
+    class: 'badge-operational',
+  };
 
   return `
     <div class="header">
@@ -86,12 +89,16 @@ function generateAssetInfoSection(asset: Asset): string {
           <span class="info-label">Current Status</span>
           <span class="info-value">${STATUS_CONFIG[asset.status]?.label || asset.status}</span>
         </div>
-        ${asset.description ? `
+        ${
+          asset.description
+            ? `
           <div class="info-row full-width">
             <span class="info-label">Description</span>
             <span class="info-value">${asset.description}</span>
           </div>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
     </div>
   `;
@@ -100,18 +107,13 @@ function generateAssetInfoSection(asset: Asset): string {
 /**
  * Generate HTML for the meter reading section
  */
-function generateMeterReadingsSection(
-  asset: Asset,
-  meterReadings: MeterReading[]
-): string {
+function generateMeterReadingsSection(asset: Asset, meterReadings: MeterReading[]): string {
   if (!asset.meterType || meterReadings.length === 0) {
     return '';
   }
 
   // Sort readings by date (newest first)
-  const sortedReadings = [...meterReadings].sort(
-    (a, b) => b.readingDate - a.readingDate
-  );
+  const sortedReadings = [...meterReadings].sort((a, b) => b.readingDate - a.readingDate);
 
   // Calculate statistics (guaranteed to exist since we check length above)
   const latestReading = sortedReadings[0];
@@ -158,12 +160,12 @@ function generateMeterReadingsSection(
           </tr>
         </thead>
         <tbody>
-          ${sortedReadings.slice(0, 20).map((reading, index) => {
-            const prevReading = sortedReadings[index + 1];
-            const change = prevReading
-              ? reading.readingValue - prevReading.readingValue
-              : 0;
-            return `
+          ${sortedReadings
+            .slice(0, 20)
+            .map((reading, index) => {
+              const prevReading = sortedReadings[index + 1];
+              const change = prevReading ? reading.readingValue - prevReading.readingValue : 0;
+              return `
               <tr>
                 <td>${formatDate(reading.readingDate)}</td>
                 <td><strong>${reading.readingValue.toLocaleString()}</strong> ${asset.meterUnit || ''}</td>
@@ -171,14 +173,19 @@ function generateMeterReadingsSection(
                 <td>${reading.notes || '--'}</td>
               </tr>
             `;
-          }).join('')}
+            })
+            .join('')}
         </tbody>
       </table>
-      ${sortedReadings.length > 20 ? `
+      ${
+        sortedReadings.length > 20
+          ? `
         <div style="text-align: center; padding: 12px; color: #666; font-style: italic;">
           Showing 20 of ${sortedReadings.length} readings
         </div>
-      ` : ''}
+      `
+          : ''
+      }
     </div>
   `;
 }
@@ -207,10 +214,7 @@ function generateWorkOrderHistorySection(workOrders: WorkOrder[]): string {
 
   // Calculate statistics
   const completedOrders = workOrders.filter(wo => wo.status === 'completed');
-  const totalTimeMinutes = completedOrders.reduce(
-    (sum, wo) => sum + (wo.timeSpentMinutes || 0),
-    0
-  );
+  const totalTimeMinutes = completedOrders.reduce((sum, wo) => sum + (wo.timeSpentMinutes || 0), 0);
   const emergencyCount = workOrders.filter(wo => wo.priority === 'emergency').length;
 
   return `
@@ -248,9 +252,14 @@ function generateWorkOrderHistorySection(workOrders: WorkOrder[]): string {
           </tr>
         </thead>
         <tbody>
-          ${sortedOrders.slice(0, 25).map(wo => {
-            const statusConfig = WO_STATUS_CONFIG[wo.status] ?? { label: 'Open', class: 'badge-open' };
-            return `
+          ${sortedOrders
+            .slice(0, 25)
+            .map(wo => {
+              const statusConfig = WO_STATUS_CONFIG[wo.status] ?? {
+                label: 'Open',
+                class: 'badge-open',
+              };
+              return `
               <tr>
                 <td><strong>${wo.woNumber}</strong></td>
                 <td>${wo.title}</td>
@@ -260,14 +269,19 @@ function generateWorkOrderHistorySection(workOrders: WorkOrder[]): string {
                 <td>${formatDuration(wo.timeSpentMinutes)}</td>
               </tr>
             `;
-          }).join('')}
+            })
+            .join('')}
         </tbody>
       </table>
-      ${sortedOrders.length > 25 ? `
+      ${
+        sortedOrders.length > 25
+          ? `
         <div style="text-align: center; padding: 12px; color: #666; font-style: italic;">
           Showing 25 of ${sortedOrders.length} work orders
         </div>
-      ` : ''}
+      `
+          : ''
+      }
     </div>
   `;
 }

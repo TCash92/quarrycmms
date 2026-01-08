@@ -34,7 +34,10 @@ const SIZE_CONFIG = {
  * Priority indicator badge for work orders
  * Shows colored dot and priority label
  */
-export function PriorityBadge({ priority, size = 'medium' }: PriorityBadgeProps): React.ReactElement {
+export function PriorityBadge({
+  priority,
+  size = 'medium',
+}: PriorityBadgeProps): React.ReactElement {
   const priorityConfig = PRIORITY_LEVELS[priority];
   const sizeConfig = SIZE_CONFIG[size];
 
