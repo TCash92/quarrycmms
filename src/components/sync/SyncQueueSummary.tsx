@@ -104,10 +104,7 @@ export function SyncQueueSummary({
 
       <View style={styles.actionsContainer}>
         <TouchableOpacity
-          style={[
-            styles.syncButton,
-            (!hasItems || isSyncing) && styles.disabledButton,
-          ]}
+          style={[styles.syncButton, (!hasItems || isSyncing) && styles.disabledButton]}
           onPress={onSyncNow}
           disabled={!hasItems || isSyncing}
           activeOpacity={0.7}
@@ -116,10 +113,7 @@ export function SyncQueueSummary({
           accessibilityState={{ disabled: !hasItems || isSyncing }}
         >
           <Text
-            style={[
-              styles.syncButtonText,
-              (!hasItems || isSyncing) && styles.disabledButtonText,
-            ]}
+            style={[styles.syncButtonText, (!hasItems || isSyncing) && styles.disabledButtonText]}
           >
             {isSyncing ? 'Syncing...' : 'Sync Now'}
           </Text>

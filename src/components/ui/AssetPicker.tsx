@@ -1,13 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Modal,
-  FlatList,
-  StyleSheet,
-  TextInput,
-} from 'react-native';
+import { View, Text, TouchableOpacity, Modal, FlatList, StyleSheet, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAssets } from '@/hooks';
 import { StatusBadge } from './StatusBadge';
@@ -44,12 +36,15 @@ export function AssetPicker({
     }
   }, [value, getAssetById]);
 
-  const handleSelect = useCallback((asset: Asset) => {
-    onChange(asset.id);
-    setSelectedAsset(asset);
-    setIsOpen(false);
-    setSearchQuery('');
-  }, [onChange, setSearchQuery]);
+  const handleSelect = useCallback(
+    (asset: Asset) => {
+      onChange(asset.id);
+      setSelectedAsset(asset);
+      setIsOpen(false);
+      setSearchQuery('');
+    },
+    [onChange, setSearchQuery]
+  );
 
   const handleOpen = useCallback(() => {
     setIsOpen(true);
@@ -61,23 +56,26 @@ export function AssetPicker({
     setSearchQuery('');
   }, [setSearchQuery]);
 
-  const renderAssetItem = useCallback(({ item }: { item: Asset }) => (
-    <TouchableOpacity
-      style={styles.assetItem}
-      onPress={() => handleSelect(item)}
-      accessibilityRole="button"
-      accessibilityLabel={`${item.assetNumber}, ${item.name}`}
-    >
-      <View style={styles.assetItemContent}>
-        <Text style={styles.assetNumber}>{item.assetNumber}</Text>
-        <Text style={styles.assetName} numberOfLines={1}>
-          {item.name}
-        </Text>
-        <Text style={styles.assetCategory}>{item.category}</Text>
-      </View>
-      <StatusBadge status={item.status} size="small" />
-    </TouchableOpacity>
-  ), [handleSelect]);
+  const renderAssetItem = useCallback(
+    ({ item }: { item: Asset }) => (
+      <TouchableOpacity
+        style={styles.assetItem}
+        onPress={() => handleSelect(item)}
+        accessibilityRole="button"
+        accessibilityLabel={`${item.assetNumber}, ${item.name}`}
+      >
+        <View style={styles.assetItemContent}>
+          <Text style={styles.assetNumber}>{item.assetNumber}</Text>
+          <Text style={styles.assetName} numberOfLines={1}>
+            {item.name}
+          </Text>
+          <Text style={styles.assetCategory}>{item.category}</Text>
+        </View>
+        <StatusBadge status={item.status} size="small" />
+      </TouchableOpacity>
+    ),
+    [handleSelect]
+  );
 
   return (
     <View>
@@ -134,7 +132,7 @@ export function AssetPicker({
           <FlatList
             data={assets}
             renderItem={renderAssetItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={item => item.id}
             style={styles.list}
             contentContainerStyle={styles.listContent}
             ListEmptyComponent={

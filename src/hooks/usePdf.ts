@@ -105,7 +105,7 @@ export function usePdf(): UsePdfReturn {
         let asset: Asset | null = null;
         try {
           asset = await database.get<Asset>('assets').find(workOrder.assetId);
-        } catch (err) {
+        } catch {
           console.warn('[usePdf] Could not find asset:', workOrder.assetId);
         }
 
@@ -118,8 +118,7 @@ export function usePdf(): UsePdfReturn {
 
         console.log('[usePdf] Work order PDF exported successfully');
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Failed to generate PDF';
+        const errorMessage = err instanceof Error ? err.message : 'Failed to generate PDF';
         console.error('[usePdf] Export failed:', errorMessage);
         setError(errorMessage);
       } finally {
@@ -160,8 +159,7 @@ export function usePdf(): UsePdfReturn {
 
         console.log('[usePdf] Asset history PDF exported successfully');
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Failed to generate PDF';
+        const errorMessage = err instanceof Error ? err.message : 'Failed to generate PDF';
         console.error('[usePdf] Export failed:', errorMessage);
         setError(errorMessage);
       } finally {
@@ -184,10 +182,7 @@ export function usePdf(): UsePdfReturn {
       try {
         // Fetch all assets
         setProgress(10);
-        const assets = await database
-          .get<Asset>('assets')
-          .query()
-          .fetch();
+        const assets = await database.get<Asset>('assets').query().fetch();
 
         // Fetch work orders in date range
         setProgress(30);
@@ -224,7 +219,8 @@ export function usePdf(): UsePdfReturn {
           assets,
           workOrders,
           meterReadings,
-          generatedBy: (authState.status === 'authenticated' ? authState.user.email : null) || 'Unknown User',
+          generatedBy:
+            (authState.status === 'authenticated' ? authState.user.email : null) || 'Unknown User',
           generatedAt: new Date(),
         };
 

@@ -52,10 +52,7 @@ export const DEFAULT_BACKOFF_CONFIG: BackoffConfig = {
  * const delay = calculateBackoff(3, { baseDelayMs: 500 });
  * ```
  */
-export function calculateBackoff(
-  attempt: number,
-  config?: Partial<BackoffConfig>
-): number {
+export function calculateBackoff(attempt: number, config?: Partial<BackoffConfig>): number {
   const cfg = { ...DEFAULT_BACKOFF_CONFIG, ...config };
 
   // Calculate exponential delay
@@ -83,10 +80,7 @@ export function calculateBackoff(
  * console.log(`Retry at ${new Date(nextRetryAt)}`);
  * ```
  */
-export function getNextRetryTime(
-  attempt: number,
-  config?: Partial<BackoffConfig>
-): number {
+export function getNextRetryTime(attempt: number, config?: Partial<BackoffConfig>): number {
   return Date.now() + calculateBackoff(attempt, config);
 }
 
@@ -118,10 +112,7 @@ export function isReadyForRetry(
 
   // Calculate delay without jitter for consistent threshold checking
   const cfg = { ...DEFAULT_BACKOFF_CONFIG, ...config };
-  const delay = Math.min(
-    cfg.maxDelayMs,
-    cfg.baseDelayMs * Math.pow(cfg.multiplier, attempt - 1)
-  );
+  const delay = Math.min(cfg.maxDelayMs, cfg.baseDelayMs * Math.pow(cfg.multiplier, attempt - 1));
 
   return Date.now() >= lastAttemptTime + delay;
 }
@@ -144,10 +135,7 @@ export function getTimeUntilRetry(
   }
 
   const cfg = { ...DEFAULT_BACKOFF_CONFIG, ...config };
-  const delay = Math.min(
-    cfg.maxDelayMs,
-    cfg.baseDelayMs * Math.pow(cfg.multiplier, attempt - 1)
-  );
+  const delay = Math.min(cfg.maxDelayMs, cfg.baseDelayMs * Math.pow(cfg.multiplier, attempt - 1));
 
   const nextRetryAt = lastAttemptTime + delay;
   const remaining = nextRetryAt - Date.now();

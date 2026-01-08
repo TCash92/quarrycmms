@@ -8,14 +8,7 @@
  */
 
 import React, { useCallback } from 'react';
-import {
-  View,
-  FlatList,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  RefreshControl,
-} from 'react-native';
+import { View, FlatList, Text, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -43,9 +36,7 @@ function EmptyState({ hasFilters }: { hasFilters: boolean }): React.ReactElement
   return (
     <View style={styles.emptyContainer}>
       <Text style={styles.emptyIcon}>🔧</Text>
-      <Text style={styles.emptyTitle}>
-        {hasFilters ? 'No Assets Found' : 'No Assets'}
-      </Text>
+      <Text style={styles.emptyTitle}>{hasFilters ? 'No Assets Found' : 'No Assets'}</Text>
       <Text style={styles.emptySubtitle}>
         {hasFilters
           ? 'Try adjusting your search or filters'
@@ -143,11 +134,7 @@ export function AssetListScreen(): React.ReactElement {
       </View>
 
       {/* Status Filter Chips */}
-      <FilterChips
-        chips={STATUS_CHIPS}
-        selected={statusFilter}
-        onSelect={handleStatusFilter}
-      />
+      <FilterChips chips={STATUS_CHIPS} selected={statusFilter} onSelect={handleStatusFilter} />
 
       {/* Results count */}
       <View style={styles.resultsHeader}>

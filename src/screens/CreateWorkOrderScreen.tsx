@@ -84,10 +84,7 @@ export function CreateWorkOrderScreen(): React.ReactElement {
       navigation.goBack();
     } catch (error) {
       console.error('[CreateWorkOrderScreen] Failed to create:', error);
-      Alert.alert(
-        'Error',
-        'Failed to create work order. Please try again.'
-      );
+      Alert.alert('Error', 'Failed to create work order. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -109,11 +106,7 @@ export function CreateWorkOrderScreen(): React.ReactElement {
           {/* Asset Selection */}
           <View style={styles.field}>
             <FieldLabel label="Asset" required />
-            <AssetPicker
-              value={assetId}
-              onChange={setAssetId}
-              placeholder="Select asset..."
-            />
+            <AssetPicker value={assetId} onChange={setAssetId} placeholder="Select asset..." />
           </View>
 
           {/* Title */}
@@ -149,8 +142,8 @@ export function CreateWorkOrderScreen(): React.ReactElement {
           {/* Info Text */}
           <View style={styles.infoContainer}>
             <Text style={styles.infoText}>
-              The work order will be created with "Open" status and assigned to
-              you. You can change the assignment later.
+              The work order will be created with "Open" status and assigned to you. You can change
+              the assignment later.
             </Text>
           </View>
         </ScrollView>

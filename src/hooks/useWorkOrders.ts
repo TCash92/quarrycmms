@@ -64,7 +64,9 @@ function generateWoNumber(): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
-  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  const random = Math.floor(Math.random() * 10000)
+    .toString()
+    .padStart(4, '0');
   return `WO-${year}${month}${day}-${random}`;
 }
 
@@ -101,13 +103,11 @@ export function useWorkOrders(): UseWorkOrdersReturn {
     const workOrdersCollection = database.get<WorkOrder>('work_orders');
 
     // Query work orders for current site
-    const query = workOrdersCollection.query(
-      Q.where('site_id', user.siteId)
-    );
+    const query = workOrdersCollection.query(Q.where('site_id', user.siteId));
 
     // Subscribe to reactive updates
     const subscription = query.observe().subscribe({
-      next: (workOrders) => {
+      next: workOrders => {
         // Sort by priority (emergency first) then due date
         const sorted = [...workOrders].sort((a, b) => {
           // First by priority (descending)
@@ -123,7 +123,7 @@ export function useWorkOrders(): UseWorkOrdersReturn {
         setAllWorkOrders(sorted);
         setIsLoading(false);
       },
-      error: (err) => {
+      error: err => {
         console.error('[useWorkOrders] Query error:', err);
         setError(err.message || 'Failed to load work orders');
         setIsLoading(false);
@@ -149,19 +149,19 @@ export function useWorkOrders(): UseWorkOrdersReturn {
 
     // Apply status filter
     if (statusFilter !== 'all') {
-      filtered = filtered.filter((wo) => wo.status === statusFilter);
+      filtered = filtered.filter(wo => wo.status === statusFilter);
     }
 
     // Apply priority filter
     if (priorityFilter !== 'all') {
-      filtered = filtered.filter((wo) => wo.priority === priorityFilter);
+      filtered = filtered.filter(wo => wo.priority === priorityFilter);
     }
 
     // Apply search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       filtered = filtered.filter(
-        (wo) =>
+        wo =>
           wo.woNumber.toLowerCase().includes(query) ||
           wo.title.toLowerCase().includes(query) ||
           (wo.description?.toLowerCase().includes(query) ?? false)
@@ -189,7 +189,7 @@ export function useWorkOrders(): UseWorkOrdersReturn {
   const createWorkOrder = useCallback(
     async (data: CreateWorkOrderData): Promise<WorkOrder> => {
       const workOrder = await database.write(async () => {
-        return await database.get<WorkOrder>('work_orders').create((wo) => {
+        return await database.get<WorkOrder>('work_orders').create(wo => {
           wo.woNumber = generateWoNumber();
           wo.siteId = user.siteId;
           wo.assetId = data.assetId;
@@ -213,7 +213,7 @@ export function useWorkOrders(): UseWorkOrdersReturn {
 
   // Force refresh
   const refreshWorkOrders = useCallback(() => {
-    setRefreshKey((k) => k + 1);
+    setRefreshKey(k => k + 1);
   }, []);
 
   return {

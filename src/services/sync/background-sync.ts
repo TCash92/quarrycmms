@@ -139,9 +139,7 @@ export async function registerBackgroundSync(
       startOnBoot: true,
     });
 
-    console.log(
-      `[BackgroundSync] Registered with ${syncConfig.minimumIntervalSeconds}s interval`
-    );
+    console.log(`[BackgroundSync] Registered with ${syncConfig.minimumIntervalSeconds}s interval`);
   } catch (error) {
     console.error('[BackgroundSync] Failed to register:', error);
     throw error;

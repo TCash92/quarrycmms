@@ -13,25 +13,13 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  RefreshControl,
-  Alert,
-  Linking,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, Alert, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSync, useAuth } from '@/hooks';
 import { Button } from '@/components/ui';
 import { BlockingIssueCard, WarningCard, SyncQueueSummary } from '@/components/sync';
 import type { IssueAction } from '@/components/sync';
-import {
-  getBlockingIssues,
-  RetryQueueItem,
-  removeFromQueue,
-} from '@/services/sync/retry-queue';
+import { getBlockingIssues, RetryQueueItem, removeFromQueue } from '@/services/sync/retry-queue';
 import {
   collectDiagnostics,
   formatRelativeTime,
@@ -144,15 +132,8 @@ function getErrorDisplay(item: RetryQueueItem): {
  */
 export function SyncDetailsScreen(_props: Props): React.ReactElement {
   const { logout } = useAuth();
-  const {
-    syncStatus,
-    performSync,
-    isSyncing,
-    isOnline,
-    isOnWiFi,
-    queueStats,
-    refreshStatus,
-  } = useSync();
+  const { syncStatus, performSync, isSyncing, isOnline, isOnWiFi, queueStats, refreshStatus } =
+    useSync();
 
   const [refreshing, setRefreshing] = useState(false);
   const [blockingIssues, setBlockingIssues] = useState<RetryQueueItem[]>([]);
@@ -164,10 +145,7 @@ export function SyncDetailsScreen(_props: Props): React.ReactElement {
    */
   const loadData = useCallback(async () => {
     try {
-      const [issues, diag] = await Promise.all([
-        getBlockingIssues(),
-        collectDiagnostics(),
-      ]);
+      const [issues, diag] = await Promise.all([getBlockingIssues(), collectDiagnostics()]);
       setBlockingIssues(issues);
       setDiagnostics(diag);
     } catch (error) {
@@ -230,20 +208,16 @@ export function SyncDetailsScreen(_props: Props): React.ReactElement {
    * Handle re-login for auth errors
    */
   const handleReLogin = useCallback(async () => {
-    Alert.alert(
-      'Log Out and Re-Login?',
-      'You will need to log in again to continue syncing.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Log Out',
-          onPress: async () => {
-            await logout();
-            // Navigation will automatically redirect to login
-          },
+    Alert.alert('Log Out and Re-Login?', 'You will need to log in again to continue syncing.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Log Out',
+        onPress: async () => {
+          await logout();
+          // Navigation will automatically redirect to login
         },
-      ]
-    );
+      },
+    ]);
   }, [logout]);
 
   /**
@@ -268,7 +242,7 @@ export function SyncDetailsScreen(_props: Props): React.ReactElement {
       } else {
         Alert.alert('Export Failed', result.error ?? 'Unknown error');
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Export Failed', 'Could not export logs. Please try again.');
     } finally {
       setExporting(false);
@@ -279,17 +253,13 @@ export function SyncDetailsScreen(_props: Props): React.ReactElement {
    * Handle force sync
    */
   const handleForceSync = useCallback(() => {
-    Alert.alert(
-      'Force Sync',
-      'This will attempt to sync all pending items immediately.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Force Sync',
-          onPress: () => performSync(),
-        },
-      ]
-    );
+    Alert.alert('Force Sync', 'This will attempt to sync all pending items immediately.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Force Sync',
+        onPress: () => performSync(),
+      },
+    ]);
   }, [performSync]);
 
   /**
@@ -308,14 +278,10 @@ export function SyncDetailsScreen(_props: Props): React.ReactElement {
 
       switch (category) {
         case 'transient':
-          return [
-            { label: 'Retry Now', onPress: () => handleRetry(item.id), variant: 'primary' },
-          ];
+          return [{ label: 'Retry Now', onPress: () => handleRetry(item.id), variant: 'primary' }];
 
         case 'auth':
-          return [
-            { label: 'Log In Again', onPress: handleReLogin, variant: 'primary' },
-          ];
+          return [{ label: 'Log In Again', onPress: handleReLogin, variant: 'primary' }];
 
         case 'validation':
           return [
@@ -328,9 +294,7 @@ export function SyncDetailsScreen(_props: Props): React.ReactElement {
               { label: 'Manage Storage', onPress: handleManageStorage, variant: 'secondary' },
             ];
           }
-          return [
-            { label: 'Skip', onPress: () => handleSkip(item.id), variant: 'destructive' },
-          ];
+          return [{ label: 'Skip', onPress: () => handleSkip(item.id), variant: 'destructive' }];
 
         default:
           return [
@@ -349,7 +313,12 @@ export function SyncDetailsScreen(_props: Props): React.ReactElement {
   const pendingAssets = queueStats?.byTable.assets ?? 0;
 
   // Check for warnings
-  const warnings: Array<{ icon: string; title: string; message: string; actions?: Array<{ label: string; onPress: () => void }> }> = [];
+  const warnings: Array<{
+    icon: string;
+    title: string;
+    message: string;
+    actions?: Array<{ label: string; onPress: () => void }>;
+  }> = [];
 
   // Low storage warning
   if (diagnostics && diagnostics.storageUsed > 500 * 1024 * 1024) {
@@ -385,9 +354,7 @@ export function SyncDetailsScreen(_props: Props): React.ReactElement {
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         {/* Status Summary */}
         <View style={styles.statusSummary}>
@@ -418,7 +385,7 @@ export function SyncDetailsScreen(_props: Props): React.ReactElement {
               </Text>
             </View>
 
-            {blockingIssues.map((item) => {
+            {blockingIssues.map(item => {
               const display = getErrorDisplay(item);
               return (
                 <BlockingIssueCard
@@ -474,24 +441,17 @@ export function SyncDetailsScreen(_props: Props): React.ReactElement {
         {diagnostics && (
           <View style={styles.debugSection}>
             <Text style={styles.debugTitle}>Diagnostics</Text>
-            <Text style={styles.debugText}>
-              Device: {diagnostics.deviceModel}
-            </Text>
+            <Text style={styles.debugText}>Device: {diagnostics.deviceModel}</Text>
             <Text style={styles.debugText}>
               OS: {diagnostics.osName} {diagnostics.osVersion}
             </Text>
+            <Text style={styles.debugText}>App: {diagnostics.appVersion}</Text>
             <Text style={styles.debugText}>
-              App: {diagnostics.appVersion}
+              Network: {diagnostics.connectionType} (
+              {diagnostics.isConnected ? 'connected' : 'disconnected'})
             </Text>
-            <Text style={styles.debugText}>
-              Network: {diagnostics.connectionType} ({diagnostics.isConnected ? 'connected' : 'disconnected'})
-            </Text>
-            <Text style={styles.debugText}>
-              Cache: {formatBytes(diagnostics.cacheSize)}
-            </Text>
-            <Text style={styles.debugText}>
-              Errors: {diagnostics.recentErrors.length} recent
-            </Text>
+            <Text style={styles.debugText}>Cache: {formatBytes(diagnostics.cacheSize)}</Text>
+            <Text style={styles.debugText}>Errors: {diagnostics.recentErrors.length} recent</Text>
           </View>
         )}
       </ScrollView>

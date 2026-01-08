@@ -16,10 +16,7 @@ import * as Crypto from 'expo-crypto';
  * @returns Promise resolving to 64-character lowercase hex string
  */
 export async function sha256(data: string): Promise<string> {
-  const hash = await Crypto.digestStringAsync(
-    Crypto.CryptoDigestAlgorithm.SHA256,
-    data
-  );
+  const hash = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, data);
   return hash.toLowerCase();
 }
 

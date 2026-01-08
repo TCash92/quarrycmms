@@ -31,7 +31,7 @@ const ACTION_TYPES: QuickLogActionType[] = ['emergency_repair', 'maintenance_pm'
 export function ActionTypePicker({ value, onChange }: ActionTypePickerProps): React.ReactElement {
   return (
     <View style={styles.container}>
-      {ACTION_TYPES.map((actionType) => {
+      {ACTION_TYPES.map(actionType => {
         const isSelected = actionType === value;
         const config = QUICK_LOG_ACTIONS[actionType];
 
@@ -49,12 +49,7 @@ export function ActionTypePicker({ value, onChange }: ActionTypePickerProps): Re
             accessibilityState={{ selected: isSelected }}
             accessibilityLabel={`${config.label} action type`}
           >
-            <Text
-              style={[
-                styles.buttonText,
-                { color: isSelected ? '#FFFFFF' : config.color },
-              ]}
-            >
+            <Text style={[styles.buttonText, { color: isSelected ? '#FFFFFF' : config.color }]}>
               {config.label}
             </Text>
           </TouchableOpacity>

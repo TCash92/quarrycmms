@@ -27,7 +27,10 @@ import { TOUCH_TARGETS } from '@/constants';
 import type WorkOrder from '@/database/models/WorkOrder';
 import type { WorkOrdersStackParamList } from '@/navigation/types';
 
-type WorkOrderListNavigationProp = NativeStackNavigationProp<WorkOrdersStackParamList, 'WorkOrderList'>;
+type WorkOrderListNavigationProp = NativeStackNavigationProp<
+  WorkOrdersStackParamList,
+  'WorkOrderList'
+>;
 
 /**
  * Empty state component when no work orders match filters
@@ -40,9 +43,7 @@ function EmptyState({ hasFilters }: { hasFilters: boolean }): React.ReactElement
         {hasFilters ? 'No Work Orders Found' : 'No Work Orders'}
       </Text>
       <Text style={styles.emptySubtitle}>
-        {hasFilters
-          ? 'Try adjusting your search or filters'
-          : 'Create a work order to get started'}
+        {hasFilters ? 'Try adjusting your search or filters' : 'Create a work order to get started'}
       </Text>
     </View>
   );
@@ -147,11 +148,7 @@ export function WorkOrderListScreen(): React.ReactElement {
       </View>
 
       {/* Status Filter Chips */}
-      <FilterChips
-        chips={statusChips}
-        selected={statusFilter}
-        onSelect={handleStatusFilter}
-      />
+      <FilterChips chips={statusChips} selected={statusFilter} onSelect={handleStatusFilter} />
 
       {/* Work Order List */}
       <FlatList

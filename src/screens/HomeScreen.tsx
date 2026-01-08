@@ -182,12 +182,9 @@ export function HomeScreen(): React.ReactElement {
           accessibilityLabel="Generate compliance report"
         >
           <Text style={styles.reportTitle}>Compliance Package</Text>
-          <Text style={styles.reportDescription}>
-            Generate PDF report for audits
-          </Text>
+          <Text style={styles.reportDescription}>Generate PDF report for audits</Text>
         </TouchableOpacity>
       </View>
-
     </SafeAreaView>
   );
 }

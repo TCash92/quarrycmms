@@ -296,7 +296,16 @@ export function WorkOrderDetailScreen(): React.ReactElement {
     } finally {
       setIsSubmitting(false);
     }
-  }, [workOrder, user, signatureData, completionNotes, failureType, timer, navigation, voiceNoteUri]);
+  }, [
+    workOrder,
+    user,
+    signatureData,
+    completionNotes,
+    failureType,
+    timer,
+    navigation,
+    voiceNoteUri,
+  ]);
 
   // Handle export PDF
   const handleExportPdf = useCallback(async () => {
@@ -361,10 +370,7 @@ export function WorkOrderDetailScreen(): React.ReactElement {
 
             {/* Failure Type */}
             <Section title="Failure Type">
-              <FailureTypePicker
-                value={failureType}
-                onChange={setFailureType}
-              />
+              <FailureTypePicker value={failureType} onChange={setFailureType} />
             </Section>
 
             {/* Completion Notes */}
@@ -532,7 +538,10 @@ export function WorkOrderDetailScreen(): React.ReactElement {
 
         {/* Dates */}
         <Section title="Dates">
-          <InfoRow label="Created" value={formatDateTime(workOrder.createdAt ?? workOrder.localUpdatedAt)} />
+          <InfoRow
+            label="Created"
+            value={formatDateTime(workOrder.createdAt ?? workOrder.localUpdatedAt)}
+          />
           <InfoRow label="Due" value={formatDateTime(workOrder.dueDate)} />
           {workOrder.startedAt && (
             <InfoRow label="Started" value={formatDateTime(workOrder.startedAt)} />
@@ -555,10 +564,7 @@ export function WorkOrderDetailScreen(): React.ReactElement {
               </View>
             )}
             {workOrder.signatureTimestamp && (
-              <InfoRow
-                label="Signed"
-                value={formatDateTime(workOrder.signatureTimestamp)}
-              />
+              <InfoRow label="Signed" value={formatDateTime(workOrder.signatureTimestamp)} />
             )}
             {workOrder.verificationCode && (
               <View style={styles.verificationRow}>
@@ -574,18 +580,12 @@ export function WorkOrderDetailScreen(): React.ReactElement {
       {workOrder.status !== 'completed' && (
         <View style={styles.buttonContainer}>
           {workOrder.status === 'open' && (
-            <TouchableOpacity
-              style={styles.startButton}
-              onPress={handleStartWorkOrder}
-            >
+            <TouchableOpacity style={styles.startButton} onPress={handleStartWorkOrder}>
               <Text style={styles.startButtonText}>Start Work Order</Text>
             </TouchableOpacity>
           )}
           {workOrder.status === 'in_progress' && (
-            <TouchableOpacity
-              style={styles.completeButton}
-              onPress={handleCompleteWorkOrder}
-            >
+            <TouchableOpacity style={styles.completeButton} onPress={handleCompleteWorkOrder}>
               <Text style={styles.completeButtonText}>Complete Work Order</Text>
             </TouchableOpacity>
           )}

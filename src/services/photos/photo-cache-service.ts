@@ -93,9 +93,7 @@ export async function deletePhotoFromCache(photoId: string): Promise<boolean> {
  * @param photoId - Unique photo identifier
  * @returns File info or null if not found
  */
-export async function getPhotoInfo(
-  photoId: string
-): Promise<FileSystem.FileInfo | null> {
+export async function getPhotoInfo(photoId: string): Promise<FileSystem.FileInfo | null> {
   try {
     const path = getPhotoPath(photoId);
     const info = await FileSystem.getInfoAsync(path);
@@ -168,9 +166,7 @@ export async function listCachedPhotos(): Promise<string[]> {
     const files = await FileSystem.readDirectoryAsync(PHOTOS_DIRECTORY);
 
     // Extract photo IDs from filenames (remove .jpg extension)
-    return files
-      .filter(f => f.endsWith('.jpg'))
-      .map(f => f.replace('.jpg', ''));
+    return files.filter(f => f.endsWith('.jpg')).map(f => f.replace('.jpg', ''));
   } catch (error) {
     console.error('[PhotoCache] Failed to list cached photos:', error);
     return [];

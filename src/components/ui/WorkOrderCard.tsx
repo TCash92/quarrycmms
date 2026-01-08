@@ -38,14 +38,19 @@ export function WorkOrderCard({ workOrder, onPress }: WorkOrderCardProps): React
   // Fetch the related asset name
   useEffect(() => {
     let mounted = true;
-    workOrder.asset.fetch().then(asset => {
-      if (mounted && asset) {
-        setAssetName(asset.assetNumber);
-      }
-    }).catch(() => {
-      // Asset might not exist
-    });
-    return () => { mounted = false; };
+    workOrder.asset
+      .fetch()
+      .then(asset => {
+        if (mounted && asset) {
+          setAssetName(asset.assetNumber);
+        }
+      })
+      .catch(() => {
+        // Asset might not exist
+      });
+    return () => {
+      mounted = false;
+    };
   }, [workOrder]);
 
   const dueDateText = formatDueDate(workOrder.dueDate);
@@ -63,8 +68,11 @@ export function WorkOrderCard({ workOrder, onPress }: WorkOrderCardProps): React
       <View style={styles.header}>
         <PriorityBadge priority={workOrder.priority} size="small" />
         <Text style={styles.status}>
-          {workOrder.status === 'open' ? 'Open' :
-           workOrder.status === 'in_progress' ? 'In Progress' : 'Completed'}
+          {workOrder.status === 'open'
+            ? 'Open'
+            : workOrder.status === 'in_progress'
+              ? 'In Progress'
+              : 'Completed'}
         </Text>
       </View>
       <Text style={styles.woNumber}>{workOrder.woNumber}</Text>
@@ -72,9 +80,7 @@ export function WorkOrderCard({ workOrder, onPress }: WorkOrderCardProps): React
         {workOrder.title}
       </Text>
       <View style={styles.footer}>
-        {assetName ? (
-          <Text style={styles.assetName}>{assetName}</Text>
-        ) : null}
+        {assetName ? <Text style={styles.assetName}>{assetName}</Text> : null}
         {dueDateText && (
           <Text style={[styles.dueDate, isOverdue && styles.overdue]}>
             {isOverdue ? '⚠️ ' : ''}Due: {dueDateText}

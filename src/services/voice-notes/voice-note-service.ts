@@ -279,10 +279,7 @@ class VoiceNoteServiceClass {
       staysActiveInBackground: false,
     });
 
-    const { sound } = await Audio.Sound.createAsync(
-      { uri },
-      { shouldPlay: false }
-    );
+    const { sound } = await Audio.Sound.createAsync({ uri }, { shouldPlay: false });
 
     this.sound = sound;
   }
@@ -366,12 +363,10 @@ class VoiceNoteServiceClass {
   /**
    * Set playback status update callback
    */
-  setPlaybackStatusCallback(
-    callback: (status: PlaybackStatus) => void
-  ): void {
+  setPlaybackStatusCallback(callback: (status: PlaybackStatus) => void): void {
     if (!this.sound) return;
 
-    this.sound.setOnPlaybackStatusUpdate((status) => {
+    this.sound.setOnPlaybackStatusUpdate(status => {
       if (!status.isLoaded) {
         callback({
           isPlaying: false,

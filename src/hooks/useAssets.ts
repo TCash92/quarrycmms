@@ -96,11 +96,11 @@ export function useAssets(): UseAssetsReturn {
 
     // Subscribe to reactive updates
     const subscription = query.observe().subscribe({
-      next: (assets) => {
+      next: assets => {
         setAllAssets(assets);
         setIsLoading(false);
       },
-      error: (err) => {
+      error: err => {
         console.error('[useAssets] Query error:', err);
         setError(err.message || 'Failed to load assets');
         setIsLoading(false);
@@ -118,19 +118,19 @@ export function useAssets(): UseAssetsReturn {
 
     // Apply status filter
     if (statusFilter !== 'all') {
-      filtered = filtered.filter((asset) => asset.status === statusFilter);
+      filtered = filtered.filter(asset => asset.status === statusFilter);
     }
 
     // Apply category filter
     if (categoryFilter !== 'all') {
-      filtered = filtered.filter((asset) => asset.category === categoryFilter);
+      filtered = filtered.filter(asset => asset.category === categoryFilter);
     }
 
     // Apply search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       filtered = filtered.filter(
-        (asset) =>
+        asset =>
           asset.assetNumber.toLowerCase().includes(query) ||
           asset.name.toLowerCase().includes(query) ||
           (asset.description?.toLowerCase().includes(query) ?? false)
@@ -142,7 +142,7 @@ export function useAssets(): UseAssetsReturn {
 
   // Extract distinct categories
   const categories = useMemo(() => {
-    const uniqueCategories = [...new Set(allAssets.map((a) => a.category))];
+    const uniqueCategories = [...new Set(allAssets.map(a => a.category))];
     return uniqueCategories.sort();
   }, [allAssets]);
 
@@ -162,7 +162,7 @@ export function useAssets(): UseAssetsReturn {
 
   // Force refresh
   const refreshAssets = useCallback(() => {
-    setRefreshKey((k) => k + 1);
+    setRefreshKey(k => k + 1);
   }, []);
 
   return {

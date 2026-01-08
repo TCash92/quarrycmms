@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  ScrollView,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-} from 'react-native';
+import { ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { TOUCH_TARGETS } from '@/constants';
 
 export interface FilterChip {
@@ -23,11 +18,7 @@ interface FilterChipsProps {
  * Horizontal scrolling filter chips
  * For filtering lists by status, category, etc.
  */
-export function FilterChips({
-  chips,
-  selected,
-  onSelect,
-}: FilterChipsProps): React.ReactElement {
+export function FilterChips({ chips, selected, onSelect }: FilterChipsProps): React.ReactElement {
   return (
     <ScrollView
       horizontal
@@ -35,7 +26,7 @@ export function FilterChips({
       contentContainerStyle={styles.container}
       accessibilityRole="tablist"
     >
-      {chips.map((chip) => {
+      {chips.map(chip => {
         const isSelected = chip.key === selected;
         return (
           <TouchableOpacity
@@ -50,12 +41,7 @@ export function FilterChips({
             accessibilityState={{ selected: isSelected }}
             accessibilityLabel={`Filter by ${chip.label}`}
           >
-            <Text
-              style={[
-                styles.chipText,
-                isSelected && styles.chipTextSelected,
-              ]}
-            >
+            <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>
               {chip.label}
             </Text>
           </TouchableOpacity>

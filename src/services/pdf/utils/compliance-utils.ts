@@ -181,8 +181,7 @@ export function calculateAuditSummary(
   const escalated = workOrders.filter(wo => {
     if (wo.status !== 'completed') return false;
     // Quick completion without notes
-    const duration =
-      wo.completedAt && wo.startedAt ? wo.completedAt - wo.startedAt : null;
+    const duration = wo.completedAt && wo.startedAt ? wo.completedAt - wo.startedAt : null;
     const quickCompletion = duration != null && duration < 5 * 60 * 1000;
     const noNotes = !wo.completionNotes || wo.completionNotes.trim() === '';
     return quickCompletion && noNotes;
@@ -273,10 +272,7 @@ export function getTruncatedPackageHash(fullHash: string, length = 16): string {
  * @param workOrders - All work orders
  * @returns Number of work orders for the asset
  */
-export function countAssetWorkOrders(
-  assetId: string,
-  workOrders: WorkOrder[]
-): number {
+export function countAssetWorkOrders(assetId: string, workOrders: WorkOrder[]): number {
   return workOrders.filter(wo => wo.assetId === assetId).length;
 }
 

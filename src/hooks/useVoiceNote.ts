@@ -232,17 +232,20 @@ export function useVoiceNote(): UseVoiceNoteReturn {
   }, []);
 
   // Load and play audio
-  const loadAndPlay = useCallback(async (uri: string): Promise<void> => {
-    try {
-      setError(null);
-      await VoiceNoteService.loadAudio(uri);
-      VoiceNoteService.setPlaybackStatusCallback(handlePlaybackStatus);
-      await VoiceNoteService.play();
-    } catch (err) {
-      console.error('[useVoiceNote] Load and play failed:', err);
-      setError('Failed to play voice note');
-    }
-  }, [handlePlaybackStatus]);
+  const loadAndPlay = useCallback(
+    async (uri: string): Promise<void> => {
+      try {
+        setError(null);
+        await VoiceNoteService.loadAudio(uri);
+        VoiceNoteService.setPlaybackStatusCallback(handlePlaybackStatus);
+        await VoiceNoteService.play();
+      } catch (err) {
+        console.error('[useVoiceNote] Load and play failed:', err);
+        setError('Failed to play voice note');
+      }
+    },
+    [handlePlaybackStatus]
+  );
 
   // Pause playback
   const pause = useCallback(async (): Promise<void> => {

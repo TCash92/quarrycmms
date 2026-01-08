@@ -9,14 +9,8 @@ import { Q } from '@nozbe/watermelondb';
 import { database } from '@/database';
 import WorkOrderPhoto from '@/database/models/WorkOrderPhoto';
 import WorkOrder from '@/database/models/WorkOrder';
-import {
-  uploadPhotoFile,
-  generateStoragePath,
-} from '@/services/photos/photo-storage-service';
-import {
-  photoExistsInCache,
-  downloadToCache,
-} from '@/services/photos/photo-cache-service';
+import { uploadPhotoFile, generateStoragePath } from '@/services/photos/photo-storage-service';
+import { photoExistsInCache, downloadToCache } from '@/services/photos/photo-cache-service';
 import {
   trackUpload,
   updateUploadState,
@@ -58,25 +52,26 @@ export async function uploadPendingPhotos(): Promise<PhotoSyncResult> {
     // - No remoteUrl (not yet uploaded to storage)
     const photoCollection = database.get<WorkOrderPhoto>('work_order_photos');
     const pendingPhotos = await photoCollection
-      .query(
-        Q.where('local_sync_status', 'pending'),
-        Q.where('remote_url', Q.eq(null))
-      )
+      .query(Q.where('local_sync_status', 'pending'), Q.where('remote_url', Q.eq(null)))
       .fetch();
 
-    logger.info('Found photos pending upload', { category: 'photo-sync', count: pendingPhotos.length });
+    logger.info('Found photos pending upload', {
+      category: 'photo-sync',
+      count: pendingPhotos.length,
+    });
 
     for (const photo of pendingPhotos) {
       try {
         // Get the work order's server ID for storage path
         const woCollection = database.get<WorkOrder>('work_orders');
-        const workOrders = await woCollection
-          .query(Q.where('id', photo.workOrderId))
-          .fetch();
+        const workOrders = await woCollection.query(Q.where('id', photo.workOrderId)).fetch();
         const workOrder = workOrders[0];
 
         if (!workOrder?.serverId) {
-          logger.debug('Skipping photo - work order not synced yet', { category: 'photo-sync', photoId: photo.id });
+          logger.debug('Skipping photo - work order not synced yet', {
+            category: 'photo-sync',
+            photoId: photo.id,
+          });
           result.skipped++;
           continue;
         }
@@ -84,7 +79,10 @@ export async function uploadPendingPhotos(): Promise<PhotoSyncResult> {
         // Check if local file exists
         const exists = await photoExistsInCache(photo.id);
         if (!exists) {
-          logger.warn('Skipping photo - local file not found', { category: 'photo-sync', photoId: photo.id });
+          logger.warn('Skipping photo - local file not found', {
+            category: 'photo-sync',
+            photoId: photo.id,
+          });
           result.skipped++;
           continue;
         }
@@ -110,13 +108,19 @@ export async function uploadPendingPhotos(): Promise<PhotoSyncResult> {
           await markUploadFailed(photo.id, uploadResult.error || 'Unknown error');
           result.failed++;
           measurePhotoUpload(durationMs, 0, false);
-          logger.error('Failed to upload photo', new Error(uploadResult.error || 'Unknown error'), { category: 'photo-sync', photoId: photo.id });
+          logger.error('Failed to upload photo', new Error(uploadResult.error || 'Unknown error'), {
+            category: 'photo-sync',
+            photoId: photo.id,
+          });
         }
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error';
         await markUploadFailed(photo.id, message);
         result.failed++;
-        logger.error('Error uploading photo', error as Error, { category: 'photo-sync', photoId: photo.id });
+        logger.error('Error uploading photo', error as Error, {
+          category: 'photo-sync',
+          photoId: photo.id,
+        });
       }
     }
   } catch (error) {
@@ -140,7 +144,10 @@ export async function downloadMissingPhotos(): Promise<PhotoSyncResult> {
       .query(Q.where('remote_url', Q.notEq(null)))
       .fetch();
 
-    logger.debug('Checking photos with remote URLs', { category: 'photo-sync', count: photosWithRemote.length });
+    logger.debug('Checking photos with remote URLs', {
+      category: 'photo-sync',
+      count: photosWithRemote.length,
+    });
 
     for (const photo of photosWithRemote) {
       try {
@@ -174,11 +181,17 @@ export async function downloadMissingPhotos(): Promise<PhotoSyncResult> {
           logger.info('Downloaded photo', { category: 'photo-sync', photoId: photo.id });
         } else {
           result.failed++;
-          logger.error('Failed to download photo', new Error('Download returned null'), { category: 'photo-sync', photoId: photo.id });
+          logger.error('Failed to download photo', new Error('Download returned null'), {
+            category: 'photo-sync',
+            photoId: photo.id,
+          });
         }
       } catch (error) {
         result.failed++;
-        logger.error('Error downloading photo', error as Error, { category: 'photo-sync', photoId: photo.id });
+        logger.error('Error downloading photo', error as Error, {
+          category: 'photo-sync',
+          photoId: photo.id,
+        });
       }
     }
   } catch (error) {
@@ -206,7 +219,10 @@ export async function retryFailedUploads(): Promise<PhotoSyncResult> {
     for (const entry of pendingUploads) {
       // Check if enough time has passed for retry
       if (!canRetry(entry)) {
-        logger.debug('Skipping photo - retry cooldown', { category: 'photo-sync', photoId: entry.photoId });
+        logger.debug('Skipping photo - retry cooldown', {
+          category: 'photo-sync',
+          photoId: entry.photoId,
+        });
         result.skipped++;
         continue;
       }
@@ -214,13 +230,14 @@ export async function retryFailedUploads(): Promise<PhotoSyncResult> {
       try {
         // Get the photo record from database
         const photoCollection = database.get<WorkOrderPhoto>('work_order_photos');
-        const photos = await photoCollection
-          .query(Q.where('id', entry.photoId))
-          .fetch();
+        const photos = await photoCollection.query(Q.where('id', entry.photoId)).fetch();
         const photo = photos[0];
 
         if (!photo) {
-          logger.warn('Photo not found in database, removing from tracker', { category: 'photo-sync', photoId: entry.photoId });
+          logger.warn('Photo not found in database, removing from tracker', {
+            category: 'photo-sync',
+            photoId: entry.photoId,
+          });
           await markUploadCompleted(entry.photoId);
           result.skipped++;
           continue;
@@ -228,7 +245,10 @@ export async function retryFailedUploads(): Promise<PhotoSyncResult> {
 
         // Check if already uploaded
         if (photo.remoteUrl) {
-          logger.debug('Photo already has remoteUrl, marking complete', { category: 'photo-sync', photoId: entry.photoId });
+          logger.debug('Photo already has remoteUrl, marking complete', {
+            category: 'photo-sync',
+            photoId: entry.photoId,
+          });
           await markUploadCompleted(entry.photoId);
           result.skipped++;
           continue;
@@ -236,13 +256,14 @@ export async function retryFailedUploads(): Promise<PhotoSyncResult> {
 
         // Get work order for storage path
         const woCollection = database.get<WorkOrder>('work_orders');
-        const workOrders = await woCollection
-          .query(Q.where('id', photo.workOrderId))
-          .fetch();
+        const workOrders = await woCollection.query(Q.where('id', photo.workOrderId)).fetch();
         const workOrder = workOrders[0];
 
         if (!workOrder?.serverId) {
-          logger.debug('Work order not synced yet', { category: 'photo-sync', photoId: entry.photoId });
+          logger.debug('Work order not synced yet', {
+            category: 'photo-sync',
+            photoId: entry.photoId,
+          });
           result.skipped++;
           continue;
         }
@@ -250,7 +271,10 @@ export async function retryFailedUploads(): Promise<PhotoSyncResult> {
         // Check if local file exists
         const exists = await photoExistsInCache(entry.photoId);
         if (!exists) {
-          logger.warn('Local file for photo not found', { category: 'photo-sync', photoId: entry.photoId });
+          logger.warn('Local file for photo not found', {
+            category: 'photo-sync',
+            photoId: entry.photoId,
+          });
           await markUploadFailed(entry.photoId, 'Local file not found');
           result.failed++;
           continue;
@@ -268,18 +292,28 @@ export async function retryFailedUploads(): Promise<PhotoSyncResult> {
           await markUploadCompleted(entry.photoId);
           result.uploaded++;
           measurePhotoUpload(durationMs, 0, true);
-          logger.info('Retry succeeded for photo', { category: 'photo-sync', photoId: entry.photoId, durationMs });
+          logger.info('Retry succeeded for photo', {
+            category: 'photo-sync',
+            photoId: entry.photoId,
+            durationMs,
+          });
         } else {
           await markUploadFailed(entry.photoId, uploadResult.error || 'Unknown error');
           result.failed++;
           measurePhotoUpload(durationMs, 0, false);
-          logger.error('Retry failed for photo', new Error(uploadResult.error || 'Unknown error'), { category: 'photo-sync', photoId: entry.photoId });
+          logger.error('Retry failed for photo', new Error(uploadResult.error || 'Unknown error'), {
+            category: 'photo-sync',
+            photoId: entry.photoId,
+          });
         }
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error';
         await markUploadFailed(entry.photoId, message);
         result.failed++;
-        logger.error('Error retrying photo', error as Error, { category: 'photo-sync', photoId: entry.photoId });
+        logger.error('Error retrying photo', error as Error, {
+          category: 'photo-sync',
+          photoId: entry.photoId,
+        });
       }
     }
   } catch (error) {
@@ -332,10 +366,7 @@ export async function syncPhotos(): Promise<PhotoSyncResult> {
 export async function getPendingPhotoUploadCount(): Promise<number> {
   const photoCollection = database.get<WorkOrderPhoto>('work_order_photos');
   const count = await photoCollection
-    .query(
-      Q.where('local_sync_status', 'pending'),
-      Q.where('remote_url', Q.eq(null))
-    )
+    .query(Q.where('local_sync_status', 'pending'), Q.where('remote_url', Q.eq(null)))
     .fetchCount();
 
   return count;

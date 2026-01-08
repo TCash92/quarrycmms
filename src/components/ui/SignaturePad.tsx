@@ -56,21 +56,23 @@ export function SignaturePad({
   const containerRef = useRef<View>(null);
   const containerLayoutRef = useRef({ x: 0, y: 0, width: 0, height: 0 });
 
-  const handleLayout = useCallback((event: { nativeEvent: { layout: { x: number; y: number; width: number; height: number } } }) => {
-    containerLayoutRef.current = event.nativeEvent.layout;
-  }, []);
-
-  const getPointFromEvent = useCallback(
-    (event: GestureResponderEvent): Point => {
-      const { pageX, pageY } = event.nativeEvent;
-      const layout = containerLayoutRef.current;
-      return {
-        x: pageX - layout.x,
-        y: pageY - layout.y,
-      };
+  const handleLayout = useCallback(
+    (event: {
+      nativeEvent: { layout: { x: number; y: number; width: number; height: number } };
+    }) => {
+      containerLayoutRef.current = event.nativeEvent.layout;
     },
     []
   );
+
+  const getPointFromEvent = useCallback((event: GestureResponderEvent): Point => {
+    const { pageX, pageY } = event.nativeEvent;
+    const layout = containerLayoutRef.current;
+    return {
+      x: pageX - layout.x,
+      y: pageY - layout.y,
+    };
+  }, []);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -82,11 +84,11 @@ export function SignaturePad({
       },
       onPanResponderMove: (event: GestureResponderEvent) => {
         const point = getPointFromEvent(event);
-        setCurrentStroke((prev) => [...prev, point]);
+        setCurrentStroke(prev => [...prev, point]);
       },
       onPanResponderRelease: () => {
         if (currentStroke.length > 0) {
-          setStrokes((prev) => [...prev, { points: currentStroke }]);
+          setStrokes(prev => [...prev, { points: currentStroke }]);
           setCurrentStroke([]);
           setHasSignature(true);
         }
@@ -155,9 +157,7 @@ export function SignaturePad({
       <View style={styles.container}>
         <View style={[styles.padContainer, styles.padDisabled]}>
           <Text style={styles.signedText}>Signature Captured</Text>
-          <Text style={styles.signedSubtext}>
-            Signed at {new Date().toLocaleTimeString()}
-          </Text>
+          <Text style={styles.signedSubtext}>Signed at {new Date().toLocaleTimeString()}</Text>
         </View>
       </View>
     );
@@ -174,9 +174,7 @@ export function SignaturePad({
         {!hasSignature && strokes.length === 0 && (
           <View style={styles.placeholder}>
             <Text style={styles.placeholderText}>Sign here</Text>
-            <Text style={styles.placeholderSubtext}>
-              Draw your signature with your finger
-            </Text>
+            <Text style={styles.placeholderSubtext}>Draw your signature with your finger</Text>
           </View>
         )}
         <View style={styles.strokeContainer}>{renderStrokes()}</View>
@@ -211,22 +209,13 @@ export function SignaturePad({
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[
-            styles.button,
-            styles.confirmButton,
-            !hasSignature && styles.buttonDisabled,
-          ]}
+          style={[styles.button, styles.confirmButton, !hasSignature && styles.buttonDisabled]}
           onPress={handleConfirm}
           disabled={!hasSignature}
           accessibilityRole="button"
           accessibilityLabel="Confirm signature"
         >
-          <Text
-            style={[
-              styles.confirmButtonText,
-              !hasSignature && styles.buttonTextDisabled,
-            ]}
-          >
+          <Text style={[styles.confirmButtonText, !hasSignature && styles.buttonTextDisabled]}>
             Confirm
           </Text>
         </TouchableOpacity>

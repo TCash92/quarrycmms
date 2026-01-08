@@ -16,10 +16,7 @@ import {
   getQueueStats,
   QueueStats,
 } from '@/services/sync';
-import {
-  isBackgroundSyncAvailable,
-  BackgroundSyncStatus,
-} from '@/services/sync/background-sync';
+import { isBackgroundSyncAvailable, BackgroundSyncStatus } from '@/services/sync/background-sync';
 import {
   getRetryCount,
   getRetryableItems,
@@ -98,7 +95,9 @@ export function useSync(): UseSyncReturn {
   const [isSyncing, setIsSyncing] = useState(false);
   const [queueStats, setQueueStats] = useState<QueueStats | null>(null);
   const [retryCount, setRetryCount] = useState(0);
-  const [backgroundSyncStatus, setBackgroundSyncStatus] = useState<BackgroundSyncStatus | null>(null);
+  const [backgroundSyncStatus, setBackgroundSyncStatus] = useState<BackgroundSyncStatus | null>(
+    null
+  );
 
   // Prevent double-sync
   const syncInProgressRef = useRef(false);
@@ -222,10 +221,13 @@ export function useSync(): UseSyncReturn {
   /**
    * Remove a failed item from the queue
    */
-  const clearFailedItem = useCallback(async (itemId: string): Promise<void> => {
-    await removeFromQueue(itemId);
-    await refreshStatus();
-  }, [refreshStatus]);
+  const clearFailedItem = useCallback(
+    async (itemId: string): Promise<void> => {
+      await removeFromQueue(itemId);
+      await refreshStatus();
+    },
+    [refreshStatus]
+  );
 
   // Subscribe to network state changes
   useEffect(() => {

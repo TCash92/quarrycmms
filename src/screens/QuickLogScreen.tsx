@@ -82,17 +82,12 @@ export function QuickLogScreen(): React.ReactElement {
       refreshRecent();
 
       // Show success feedback
-      Alert.alert(
-        'Logged!',
-        'Your Quick Log has been saved. You can add more details later.',
-        [{ text: 'OK' }]
-      );
+      Alert.alert('Logged!', 'Your Quick Log has been saved. You can add more details later.', [
+        { text: 'OK' },
+      ]);
     } catch (error) {
       console.error('[QuickLogScreen] Failed to create:', error);
-      Alert.alert(
-        'Error',
-        'Failed to save Quick Log. Please try again.'
-      );
+      Alert.alert('Error', 'Failed to save Quick Log. Please try again.');
     }
   }, [isValid, assetId, actionType, notes, createQuickLog, refreshRecent]);
 
@@ -113,7 +108,8 @@ export function QuickLogScreen(): React.ReactElement {
           {unenrichedCount > 0 && (
             <View style={styles.unenrichedBadge}>
               <Text style={styles.unenrichedText}>
-                {unenrichedCount} Quick Log{unenrichedCount !== 1 ? 's' : ''} need{unenrichedCount === 1 ? 's' : ''} more detail
+                {unenrichedCount} Quick Log{unenrichedCount !== 1 ? 's' : ''} need
+                {unenrichedCount === 1 ? 's' : ''} more detail
               </Text>
             </View>
           )}
@@ -132,11 +128,7 @@ export function QuickLogScreen(): React.ReactElement {
           {/* Or Select Asset */}
           <View style={styles.section}>
             <SectionHeader title="Or Select Asset" />
-            <AssetPicker
-              value={assetId}
-              onChange={setAssetId}
-              placeholder="Search all assets..."
-            />
+            <AssetPicker value={assetId} onChange={setAssetId} placeholder="Search all assets..." />
           </View>
 
           {/* What did you do? */}

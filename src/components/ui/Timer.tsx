@@ -8,15 +8,7 @@
  */
 
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Modal,
-  TextInput,
-  Alert,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, Alert } from 'react-native';
 import { TOUCH_TARGETS } from '@/constants';
 import type { PauseReason } from '@/hooks/useTimer';
 
@@ -97,9 +89,7 @@ export function Timer({
       {/* Timer Display */}
       <View style={styles.timerDisplay}>
         <Text style={styles.timerText}>{formattedTime}</Text>
-        {isPaused && (
-          <Text style={styles.pausedIndicator}>PAUSED</Text>
-        )}
+        {isPaused && <Text style={styles.pausedIndicator}>PAUSED</Text>}
       </View>
 
       {/* Pause Message */}
@@ -164,9 +154,7 @@ export function Timer({
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Set Time Manually</Text>
-            <Text style={styles.modalSubtitle}>
-              Enter the total time spent (in minutes):
-            </Text>
+            <Text style={styles.modalSubtitle}>Enter the total time spent (in minutes):</Text>
 
             <TextInput
               style={styles.input}

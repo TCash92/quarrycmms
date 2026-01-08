@@ -17,17 +17,14 @@ const PRIORITIES: WorkOrderPriority[] = ['low', 'medium', 'high', 'emergency'];
 export function PriorityPicker({ value, onChange }: PriorityPickerProps): React.ReactElement {
   return (
     <View style={styles.container}>
-      {PRIORITIES.map((priority) => {
+      {PRIORITIES.map(priority => {
         const isSelected = priority === value;
         const config = PRIORITY_LEVELS[priority];
 
         return (
           <TouchableOpacity
             key={priority}
-            style={[
-              styles.chip,
-              isSelected && { backgroundColor: config.color },
-            ]}
+            style={[styles.chip, isSelected && { backgroundColor: config.color }]}
             onPress={() => onChange(priority)}
             accessibilityRole="radio"
             accessibilityState={{ selected: isSelected }}

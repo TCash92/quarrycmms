@@ -214,9 +214,7 @@ function checkAlerts(telemetry: DeviceTelemetry): string[] {
   }
 
   if (telemetry.consecutiveSyncFailures >= ALERT_THRESHOLDS.CONSECUTIVE_SYNC_FAILURES) {
-    alerts.push(
-      `Sync failure alert: ${telemetry.consecutiveSyncFailures} consecutive failures`
-    );
+    alerts.push(`Sync failure alert: ${telemetry.consecutiveSyncFailures} consecutive failures`);
   }
 
   if (telemetry.voiceNoteQualityRate < ALERT_THRESHOLDS.VOICE_NOTE_QUALITY_RATE) {

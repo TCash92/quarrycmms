@@ -55,9 +55,7 @@ function formatTime(totalSeconds: number): string {
       .toString()
       .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
-  return `${minutes.toString().padStart(2, '0')}:${seconds
-    .toString()
-    .padStart(2, '0')}`;
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
 /**
@@ -98,7 +96,7 @@ export function useTimer(initialSeconds: number = 0): UseTimerReturn {
     lastInteractionRef.current = Date.now();
 
     intervalRef.current = setInterval(() => {
-      setElapsedSeconds((prev) => prev + 1);
+      setElapsedSeconds(prev => prev + 1);
     }, 1000);
   }, [isRunning]);
 
@@ -141,7 +139,7 @@ export function useTimer(initialSeconds: number = 0): UseTimerReturn {
     lastInteractionRef.current = Date.now();
 
     intervalRef.current = setInterval(() => {
-      setElapsedSeconds((prev) => prev + 1);
+      setElapsedSeconds(prev => prev + 1);
     }, 1000);
   }, [isPaused]);
 
@@ -177,11 +175,7 @@ export function useTimer(initialSeconds: number = 0): UseTimerReturn {
         backgroundTimeRef.current = Date.now();
       } else if (nextAppState === 'active') {
         // App coming to foreground - check if we need to auto-pause
-        if (
-          isRunning &&
-          !isPaused &&
-          backgroundTimeRef.current
-        ) {
+        if (isRunning && !isPaused && backgroundTimeRef.current) {
           const backgroundDuration = Date.now() - backgroundTimeRef.current;
           if (backgroundDuration >= TIMER_THRESHOLDS.APP_BACKGROUND_MS) {
             autoPause('backgrounded');

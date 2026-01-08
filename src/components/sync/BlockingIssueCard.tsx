@@ -100,9 +100,7 @@ export function BlockingIssueCard({
 
       <Text style={styles.message}>{message}</Text>
 
-      {technicalDetails && (
-        <Text style={styles.technicalDetails}>{technicalDetails}</Text>
-      )}
+      {technicalDetails && <Text style={styles.technicalDetails}>{technicalDetails}</Text>}
 
       {actions.length > 0 && (
         <View style={styles.actionsContainer}>

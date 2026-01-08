@@ -120,9 +120,7 @@ export async function canSafelyReset(): Promise<ResetSafetyCheck> {
     }
 
     if (result.pendingMeterReadings > 0) {
-      result.warnings.push(
-        `${result.pendingMeterReadings} meter reading(s) have not been synced`
-      );
+      result.warnings.push(`${result.pendingMeterReadings} meter reading(s) have not been synced`);
       result.safe = false;
     }
 
@@ -167,9 +165,7 @@ export async function exportPendingDataBeforeReset(): Promise<string | null> {
 
     // Export pending work orders
     const woCollection = database.get('work_orders');
-    const pendingWos = await woCollection
-      .query(Q.where('local_sync_status', 'pending'))
-      .fetch();
+    const pendingWos = await woCollection.query(Q.where('local_sync_status', 'pending')).fetch();
     pendingData.workOrders = pendingWos.map(wo => ({
       id: wo.id,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -400,8 +396,7 @@ export async function getLocalStorageUsage(): Promise<{
     const meterCount = await database.get('meter_readings').query().fetchCount();
 
     // Rough estimates: WO ~2KB, Asset ~1KB, Photo record ~0.5KB, Meter ~0.3KB
-    databaseMb =
-      (woCount * 2 + assetCount * 1 + photoCount * 0.5 + meterCount * 0.3) / 1024;
+    databaseMb = (woCount * 2 + assetCount * 1 + photoCount * 0.5 + meterCount * 0.3) / 1024;
 
     // Check photo cache size
     const photoCacheDir = `${cacheDirectory}photos/`;

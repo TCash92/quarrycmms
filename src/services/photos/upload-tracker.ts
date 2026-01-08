@@ -86,9 +86,7 @@ export async function getTrackedUploads(): Promise<UploadEntry[]> {
 export async function getPendingUploads(): Promise<UploadEntry[]> {
   const uploads = await loadTrackedUploads();
   return uploads.filter(
-    u =>
-      (u.state === 'pending' || u.state === 'failed') &&
-      u.attempts < MAX_RETRY_ATTEMPTS
+    u => (u.state === 'pending' || u.state === 'failed') && u.attempts < MAX_RETRY_ATTEMPTS
   );
 }
 

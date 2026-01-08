@@ -41,7 +41,10 @@ export async function signIn(
 
   if (profileError || !profile) {
     // If profile doesn't exist yet, use defaults for development
-    logger.warn('Profile not found, using defaults', { category: 'auth', error: profileError?.message });
+    logger.warn('Profile not found, using defaults', {
+      category: 'auth',
+      error: profileError?.message,
+    });
     const defaultProfile = {
       name: data.user.email?.split('@')[0] ?? 'User',
       site_id: 'default-site',
@@ -132,7 +135,9 @@ export async function ensureValidToken(): Promise<string | null> {
       return refreshedToken;
     }
   } catch {
-    logger.debug('Token refresh failed (offline?), checking offline validity', { category: 'auth' });
+    logger.debug('Token refresh failed (offline?), checking offline validity', {
+      category: 'auth',
+    });
   }
 
   // Offline fallback: use existing token if refresh token still valid (7-day window)

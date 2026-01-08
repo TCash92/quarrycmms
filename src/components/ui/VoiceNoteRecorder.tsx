@@ -8,14 +8,7 @@
  */
 
 import React, { useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  Modal,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import { View, Text, Modal, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useVoiceNote } from '@/hooks';
 import { TOUCH_TARGETS } from '@/constants';
@@ -48,7 +41,13 @@ function formatDuration(ms: number): string {
 /**
  * Waveform visualization component
  */
-function Waveform({ level, isRecording }: { level: number; isRecording: boolean }): React.ReactElement {
+function Waveform({
+  level,
+  isRecording,
+}: {
+  level: number;
+  isRecording: boolean;
+}): React.ReactElement {
   // Normalize level from -160..0 dB to 0..1
   const normalizedLevel = Math.max(0, Math.min(1, (level + 160) / 160));
 
@@ -72,11 +71,7 @@ function Waveform({ level, isRecording }: { level: number; isRecording: boolean 
       {bars.map((height, index) => (
         <View
           key={index}
-          style={[
-            styles.waveformBar,
-            { height },
-            isRecording && styles.waveformBarActive,
-          ]}
+          style={[styles.waveformBar, { height }, isRecording && styles.waveformBarActive]}
         />
       ))}
     </View>
@@ -123,15 +118,13 @@ export function VoiceNoteRecorder({
     if (recordingDuration >= maxDuration && isRecording) {
       handleStopRecording();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recordingDuration, maxDuration, isRecording]);
 
   // Show error alert
   useEffect(() => {
     if (error) {
-      Alert.alert('Recording Error', error, [
-        { text: 'OK', onPress: clearError },
-      ]);
+      Alert.alert('Recording Error', error, [{ text: 'OK', onPress: clearError }]);
     }
   }, [error, clearError]);
 
@@ -188,17 +181,10 @@ export function VoiceNoteRecorder({
 
           {/* Duration Counter */}
           <View style={styles.durationContainer}>
-            <Text
-              style={[
-                styles.duration,
-                isNearLimit && styles.durationWarning,
-              ]}
-            >
+            <Text style={[styles.duration, isNearLimit && styles.durationWarning]}>
               {formatDuration(recordingDuration)}
             </Text>
-            <Text style={styles.maxDuration}>
-              / {formatDuration(maxDuration)}
-            </Text>
+            <Text style={styles.maxDuration}>/ {formatDuration(maxDuration)}</Text>
           </View>
 
           {/* Record/Stop Button */}
