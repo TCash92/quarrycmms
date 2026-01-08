@@ -496,6 +496,7 @@ async function applyWorkOrderChanges(
           record.voiceNoteConfidence = remote.voice_note_confidence;
           record.needsEnrichment = remote.needs_enrichment;
           record.isQuickLog = remote.is_quick_log;
+          record.createdAt = remote.created_at ? new Date(remote.created_at).getTime() : null;
           record.serverUpdatedAt = new Date(remote.updated_at).getTime();
           record.localSyncStatus = 'synced';
         });
@@ -532,6 +533,7 @@ async function applyWorkOrderChanges(
         record.voiceNoteConfidence = remote.voice_note_confidence;
         record.needsEnrichment = remote.needs_enrichment;
         record.isQuickLog = remote.is_quick_log;
+        record.createdAt = remote.created_at ? new Date(remote.created_at).getTime() : null;
         record.localSyncStatus = 'synced';
         record.localUpdatedAt = new Date(remote.updated_at).getTime();
         record.serverUpdatedAt = new Date(remote.updated_at).getTime();
