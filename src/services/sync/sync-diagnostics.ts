@@ -9,6 +9,7 @@
 
 import * as Device from 'expo-device';
 import * as FileSystem from 'expo-file-system';
+import { cacheDirectory, documentDirectory } from 'expo-file-system/legacy';
 import * as Application from 'expo-application';
 import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -113,8 +114,8 @@ async function getDirectorySize(uri: string): Promise<number> {
  */
 export async function getStorageInfo(): Promise<StorageInfo> {
   try {
-    const cacheDir = FileSystem.cacheDirectory;
-    const documentDir = FileSystem.documentDirectory;
+    const cacheDir = cacheDirectory;
+    const documentDir = documentDirectory;
 
     const [cacheSize, documentSize] = await Promise.all([
       cacheDir ? getDirectorySize(cacheDir) : 0,

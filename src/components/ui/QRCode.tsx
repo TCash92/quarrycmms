@@ -101,8 +101,10 @@ export function generateQRCodeSvgString(value: string, size: number = 100): stri
   svg += `<rect fill="#FFFFFF" width="${size}" height="${size}"/>`;
 
   for (let row = 0; row < qrMatrix.length; row++) {
-    for (let col = 0; col < qrMatrix[row].length; col++) {
-      if (qrMatrix[row][col]) {
+    const rowData = qrMatrix[row];
+    if (!rowData) continue;
+    for (let col = 0; col < rowData.length; col++) {
+      if (rowData[col]) {
         const x = col * moduleSize;
         const y = row * moduleSize;
         svg += `<rect fill="#000000" x="${x}" y="${y}" width="${moduleSize}" height="${moduleSize}"/>`;
@@ -143,14 +145,18 @@ function generateQRMatrix(value: string): boolean[][] {
   addFinderPattern(matrix, 0, size - 7);
 
   // Add timing patterns
+  const row6 = matrix[6];
   for (let i = 8; i < size - 8; i++) {
-    matrix[6][i] = i % 2 === 0;
-    matrix[i][6] = i % 2 === 0;
+    if (row6) row6[i] = i % 2 === 0;
+    const rowI = matrix[i];
+    if (rowI) rowI[6] = i % 2 === 0;
   }
 
   // Fill data area with pattern based on hash
   const seed = Math.abs(hash);
   for (let row = 0; row < size; row++) {
+    const matrixRow = matrix[row];
+    if (!matrixRow) continue;
     for (let col = 0; col < size; col++) {
       // Skip finder patterns and timing patterns
       if (isReservedModule(row, col, size)) continue;
@@ -158,7 +164,7 @@ function generateQRMatrix(value: string): boolean[][] {
       // Generate pseudo-random pattern based on position and hash
       const position = row * size + col;
       const pseudoRandom = ((seed * (position + 1)) % 997) / 997;
-      matrix[row][col] = pseudoRandom > 0.5;
+      matrixRow[col] = pseudoRandom > 0.5;
     }
   }
 
@@ -170,10 +176,12 @@ function generateQRMatrix(value: string): boolean[][] {
  */
 function addFinderPattern(matrix: boolean[][], startRow: number, startCol: number): void {
   for (let row = 0; row < 7; row++) {
+    const matrixRow = matrix[startRow + row];
+    if (!matrixRow) continue;
     for (let col = 0; col < 7; col++) {
       const isOuter = row === 0 || row === 6 || col === 0 || col === 6;
       const isInner = row >= 2 && row <= 4 && col >= 2 && col <= 4;
-      matrix[startRow + row][startCol + col] = isOuter || isInner;
+      matrixRow[startCol + col] = isOuter || isInner;
     }
   }
 }

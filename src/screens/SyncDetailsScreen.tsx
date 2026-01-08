@@ -18,13 +18,11 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   RefreshControl,
   Alert,
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
 import { useSync, useAuth } from '@/hooks';
 import { Button } from '@/components/ui';
 import { BlockingIssueCard, WarningCard, SyncQueueSummary } from '@/components/sync';
@@ -41,7 +39,6 @@ import {
   DeviceDiagnostics,
 } from '@/services/sync/sync-diagnostics';
 import { exportLogsForSupport, shareExportedLogs } from '@/services/sync/sync-export';
-import { TOUCH_TARGETS } from '@/constants';
 import type { HomeStackScreenProps } from '@/navigation/types';
 
 type Props = HomeStackScreenProps<'SyncDetails'>;
@@ -146,7 +143,6 @@ function getErrorDisplay(item: RetryQueueItem): {
  * Sync Details / What's Blocking screen
  */
 export function SyncDetailsScreen(_props: Props): React.ReactElement {
-  const navigation = useNavigation();
   const { logout } = useAuth();
   const {
     syncStatus,

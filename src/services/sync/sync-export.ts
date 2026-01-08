@@ -12,6 +12,7 @@
  */
 
 import * as FileSystem from 'expo-file-system';
+import { documentDirectory, EncodingType } from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { collectDiagnostics, getRecentSyncErrors, DeviceDiagnostics } from './sync-diagnostics';
 import { getRecentConflicts, ConflictLogEntry } from './conflict-log';
@@ -19,7 +20,7 @@ import { getQueueStats } from './retry-queue';
 import { getTrackedUploads } from '../photos/upload-tracker';
 
 /** Directory for export files */
-const EXPORT_DIRECTORY = `${FileSystem.documentDirectory}exports/`;
+const EXPORT_DIRECTORY = `${documentDirectory}exports/`;
 
 /** Auto-delete exports after this time (24 hours) */
 const EXPORT_RETENTION_MS = 24 * 60 * 60 * 1000;
@@ -125,30 +126,16 @@ async function cleanupOldExports(): Promise<void> {
 }
 
 /**
- * Format sync error for export (sanitize any sensitive data)
- */
-function formatSyncError(error: { timestamp: number; message: string; category: string; tableName?: string; recordId?: string }) {
-  return {
-    timestamp: new Date(error.timestamp).toISOString(),
-    message: error.message,
-    category: error.category,
-    tableName: error.tableName,
-    // Only include record ID prefix for correlation, not full ID
-    recordId: error.recordId ? `${error.recordId.slice(0, 8)}...` : undefined,
-  };
-}
-
-/**
  * Format conflict for export
  */
 function formatConflict(conflict: ConflictLogEntry) {
   return {
-    timestamp: new Date(conflict.occurredAt).toISOString(),
+    timestamp: new Date(conflict.timestamp).toISOString(),
     tableName: conflict.tableName,
     // Only include record ID prefix
     recordId: `${conflict.recordId.slice(0, 8)}...`,
-    resolution: conflict.resolution,
-    escalated: conflict.escalated,
+    resolution: conflict.autoResolved ? 'auto-resolved' : 'escalated',
+    escalated: !conflict.autoResolved,
   };
 }
 
@@ -189,7 +176,13 @@ export async function exportLogsForSupport(): Promise<ExportResult> {
       exportedAt: new Date().toISOString(),
       exportVersion: '1.0',
       deviceDiagnostics: diagnostics,
-      syncErrors: syncErrors.map(formatSyncError),
+      syncErrors: syncErrors.map(e => ({
+        timestamp: new Date(e.timestamp).toISOString(),
+        message: e.message,
+        category: e.category,
+        ...(e.tableName && { tableName: e.tableName }),
+        ...(e.recordId && { recordId: `${e.recordId.slice(0, 8)}...` }),
+      })),
       conflicts: conflicts.map(formatConflict),
       queueStatus: {
         pending: queueStats.pending,
@@ -201,7 +194,7 @@ export async function exportLogsForSupport(): Promise<ExportResult> {
         photoId: `${u.photoId.slice(0, 8)}...`,
         state: u.state,
         attempts: u.attempts,
-        error: u.error,
+        ...(u.error && { error: u.error }),
       })),
       // Document what we explicitly exclude
       _excludedData: [
@@ -219,7 +212,7 @@ export async function exportLogsForSupport(): Promise<ExportResult> {
     const content = JSON.stringify(exportData, null, 2);
 
     await FileSystem.writeAsStringAsync(filePath, content, {
-      encoding: FileSystem.EncodingType.UTF8,
+      encoding: EncodingType.UTF8,
     });
 
     // Get file size

@@ -24,11 +24,11 @@ export interface LogEntry {
   /** Log message */
   message: string;
   /** Additional context data */
-  context?: Record<string, unknown>;
+  context?: Record<string, unknown> | undefined;
   /** ISO timestamp */
   timestamp: string;
   /** Category for grouping logs */
-  category?: string;
+  category?: string | undefined;
 }
 
 /**
@@ -83,7 +83,7 @@ function addBreadcrumb(entry: LogEntry): void {
     category: entry.category || 'log',
     message: entry.message,
     level: SENTRY_SEVERITY[entry.level],
-    data: entry.context,
+    ...(entry.context && { data: entry.context }),
     timestamp: Date.now() / 1000,
   });
 }
@@ -132,7 +132,7 @@ function log(
   // Report errors to Sentry
   if (level === 'error' && error) {
     Sentry.captureException(error, {
-      extra: context,
+      ...(context && { extra: context }),
       tags: {
         category: entry.category || 'unknown',
       },
@@ -176,7 +176,7 @@ export const logger = {
    * Capture an exception to Sentry with optional context
    */
   captureException(error: Error, context?: Record<string, unknown>): void {
-    Sentry.captureException(error, { extra: context });
+    Sentry.captureException(error, context ? { extra: context } : undefined);
   },
 
   /**

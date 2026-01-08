@@ -24,7 +24,7 @@ export interface CreateQuickLogData {
   /** Type of action performed */
   actionType: QuickLogActionType;
   /** Optional quick notes (max 100 chars) */
-  notes?: string;
+  notes?: string | undefined;
 }
 
 /**

@@ -18,8 +18,6 @@ import {
   StyleSheet,
   PanResponder,
   GestureResponderEvent,
-  PanResponderGestureState,
-  Dimensions,
 } from 'react-native';
 import { TOUCH_TARGETS } from '@/constants';
 
@@ -127,6 +125,8 @@ export function SignaturePad({
 
       return stroke.points.slice(1).map((point, pointIndex) => {
         const prevPoint = stroke.points[pointIndex];
+        // prevPoint is guaranteed to exist since we slice from index 1
+        if (!prevPoint) return null;
         const dx = point.x - prevPoint.x;
         const dy = point.y - prevPoint.y;
         const length = Math.sqrt(dx * dx + dy * dy);

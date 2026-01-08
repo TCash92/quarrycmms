@@ -9,6 +9,7 @@
 
 import { Q } from '@nozbe/watermelondb';
 import * as FileSystem from 'expo-file-system';
+import { documentDirectory, cacheDirectory, EncodingType } from 'expo-file-system/legacy';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { database } from '@/database';
 import { clearAuthData, getStoredAuthData, storeAuthData } from '@/services/auth/auth-storage';
@@ -62,7 +63,7 @@ const TABLES_TO_CLEAR = ['work_orders', 'assets', 'meter_readings', 'work_order_
 /**
  * AsyncStorage keys to preserve during reset
  */
-const PRESERVED_ASYNC_KEYS = [
+const PRESERVED_ASYNC_KEYS: string[] = [
   // Auth-related keys are preserved via SecureStore
 ];
 
@@ -220,10 +221,10 @@ export async function exportPendingDataBeforeReset(): Promise<string | null> {
     // Write to file
     const timestamp = new Date().toISOString().replace(/[:.]/g, '').slice(0, 15);
     const fileName = `pending_data_backup_${timestamp}.json`;
-    const filePath = `${FileSystem.documentDirectory}${fileName}`;
+    const filePath = `${documentDirectory}${fileName}`;
 
     await FileSystem.writeAsStringAsync(filePath, JSON.stringify(pendingData, null, 2), {
-      encoding: FileSystem.EncodingType.UTF8,
+      encoding: EncodingType.UTF8,
     });
 
     logger.info('Pending data exported', {
@@ -320,7 +321,7 @@ export async function resetLocalDatabase(options: ResetOptions): Promise<ResetRe
 
     // Clear photo cache directory
     try {
-      const cacheDir = `${FileSystem.cacheDirectory}photos/`;
+      const cacheDir = `${cacheDirectory}photos/`;
       const cacheInfo = await FileSystem.getInfoAsync(cacheDir);
       if (cacheInfo.exists) {
         await FileSystem.deleteAsync(cacheDir, { idempotent: true });
@@ -335,7 +336,7 @@ export async function resetLocalDatabase(options: ResetOptions): Promise<ResetRe
 
     // Clear voice notes directory
     try {
-      const voiceDir = `${FileSystem.documentDirectory}voice_notes/`;
+      const voiceDir = `${documentDirectory}voice_notes/`;
       const voiceInfo = await FileSystem.getInfoAsync(voiceDir);
       if (voiceInfo.exists) {
         await FileSystem.deleteAsync(voiceDir, { idempotent: true });
@@ -403,12 +404,12 @@ export async function getLocalStorageUsage(): Promise<{
       (woCount * 2 + assetCount * 1 + photoCount * 0.5 + meterCount * 0.3) / 1024;
 
     // Check photo cache size
-    const cacheDir = `${FileSystem.cacheDirectory}photos/`;
-    const cacheInfo = await FileSystem.getInfoAsync(cacheDir);
+    const photoCacheDir = `${cacheDirectory}photos/`;
+    const cacheInfo = await FileSystem.getInfoAsync(photoCacheDir);
     if (cacheInfo.exists) {
-      const files = await FileSystem.readDirectoryAsync(cacheDir);
+      const files = await FileSystem.readDirectoryAsync(photoCacheDir);
       for (const file of files) {
-        const fileInfo = await FileSystem.getInfoAsync(`${cacheDir}${file}`);
+        const fileInfo = await FileSystem.getInfoAsync(`${photoCacheDir}${file}`);
         if (fileInfo.exists && fileInfo.size) {
           photosMb += fileInfo.size / (1024 * 1024);
         }
@@ -416,7 +417,7 @@ export async function getLocalStorageUsage(): Promise<{
     }
 
     // Check voice notes size
-    const voiceDir = `${FileSystem.documentDirectory}voice_notes/`;
+    const voiceDir = `${documentDirectory}voice_notes/`;
     const voiceInfo = await FileSystem.getInfoAsync(voiceDir);
     if (voiceInfo.exists) {
       const files = await FileSystem.readDirectoryAsync(voiceDir);

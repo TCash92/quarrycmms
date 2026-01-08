@@ -9,6 +9,7 @@
 
 import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
+import { documentDirectory } from 'expo-file-system/legacy';
 
 /**
  * Result of a completed voice note recording
@@ -31,7 +32,7 @@ export interface RecordingStatus {
   /** Duration in milliseconds */
   durationMillis: number;
   /** Audio level for visualization (-160 to 0 dB) */
-  metering?: number;
+  metering?: number | undefined;
 }
 
 /**
@@ -52,7 +53,7 @@ export interface PlaybackStatus {
 const MAX_RECORDING_DURATION_MS = 120000;
 
 /** Voice notes directory in app documents */
-const VOICE_NOTES_DIR = `${FileSystem.documentDirectory}voice_notes/`;
+const VOICE_NOTES_DIR = `${documentDirectory}voice_notes/`;
 
 /**
  * Recording options per specification:

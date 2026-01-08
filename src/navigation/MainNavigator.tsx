@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { HomeStackNavigator } from './HomeStackNavigator';
 import { AssetsStackNavigator } from './AssetsStackNavigator';
@@ -9,19 +9,6 @@ import { TOUCH_TARGETS } from '@/constants';
 import type { MainTabParamList } from './types';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
-
-/**
- * Placeholder screen for tabs not yet implemented
- */
-function PlaceholderTab({ name }: { name: string }): React.ReactElement {
-  return (
-    <View style={placeholderStyles.container}>
-      <Text style={placeholderStyles.title}>{name}</Text>
-      <Text style={placeholderStyles.subtitle}>Coming in future PR</Text>
-    </View>
-  );
-}
-
 
 /**
  * Main tab navigator for authenticated users
@@ -111,25 +98,6 @@ const styles = StyleSheet.create({
   tabBarLabel: {
     fontSize: 12,
     fontWeight: '600',
-  },
-});
-
-const placeholderStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666666',
   },
 });
 

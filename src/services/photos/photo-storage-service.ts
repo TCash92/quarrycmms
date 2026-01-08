@@ -8,6 +8,7 @@
 import { getSupabaseClient } from '@/services/auth/supabase-client';
 import { config } from '@/config';
 import { readPhotoAsBase64 } from './photo-cache-service';
+import { EncodingType } from 'expo-file-system/legacy';
 
 /**
  * Result of a photo upload operation
@@ -166,7 +167,7 @@ export async function uploadPhotoFromUri(
 
     // Read file as base64
     const base64 = await FileSystem.readAsStringAsync(localUri, {
-      encoding: FileSystem.EncodingType.Base64,
+      encoding: EncodingType.Base64,
     });
 
     // Convert to ArrayBuffer for upload
@@ -262,7 +263,7 @@ export async function photoExistsInStorage(storagePath: string): Promise<boolean
     const directory = pathParts.join('/');
 
     const { data, error } = await supabase.storage.from(config.storageBucket).list(directory, {
-      search: fileName,
+      ...(fileName && { search: fileName }),
     });
 
     if (error) {

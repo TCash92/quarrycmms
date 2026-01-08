@@ -104,7 +104,7 @@ export async function uploadPendingPhotos(): Promise<PhotoSyncResult> {
           await photo.markAsSynced(uploadResult.remoteUrl);
           await markUploadCompleted(photo.id);
           result.uploaded++;
-          measurePhotoUpload(durationMs, uploadResult.sizeBytes || 0, true);
+          measurePhotoUpload(durationMs, 0, true);
           logger.info('Uploaded photo', { category: 'photo-sync', photoId: photo.id, durationMs });
         } else {
           await markUploadFailed(photo.id, uploadResult.error || 'Unknown error');
@@ -267,7 +267,7 @@ export async function retryFailedUploads(): Promise<PhotoSyncResult> {
           await photo.markAsSynced(uploadResult.remoteUrl);
           await markUploadCompleted(entry.photoId);
           result.uploaded++;
-          measurePhotoUpload(durationMs, uploadResult.sizeBytes || 0, true);
+          measurePhotoUpload(durationMs, 0, true);
           logger.info('Retry succeeded for photo', { category: 'photo-sync', photoId: entry.photoId, durationMs });
         } else {
           await markUploadFailed(entry.photoId, uploadResult.error || 'Unknown error');

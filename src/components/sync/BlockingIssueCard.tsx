@@ -31,11 +31,11 @@ export interface BlockingIssueCardProps {
   /** User-friendly message explaining the issue */
   message: string;
   /** Technical details for debugging (optional) */
-  technicalDetails?: string;
+  technicalDetails?: string | undefined;
   /** Action buttons to resolve the issue */
   actions: IssueAction[];
   /** Test ID for e2e testing */
-  testID?: string;
+  testID?: string | undefined;
 }
 
 /**

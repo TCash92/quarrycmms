@@ -44,6 +44,7 @@ export default class WorkOrder extends Model {
   @text('local_sync_status') localSyncStatus!: LocalSyncStatus;
   @field('local_updated_at') localUpdatedAt!: number;
   @field('server_updated_at') serverUpdatedAt!: number | null;
+  @field('created_at') createdAt!: number | null;
 
   @relation('assets', 'asset_id') asset!: Relation<Asset>;
   @children('work_order_photos') photos!: Query<WorkOrderPhoto>;

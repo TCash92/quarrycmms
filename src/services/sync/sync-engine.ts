@@ -41,7 +41,7 @@ import {
   getPendingPhotoUploadCount,
   PhotoSyncResult,
 } from './photo-sync';
-import { classifyError, ClassifiedError } from './error-classifier';
+import { classifyError } from './error-classifier';
 import {
   enqueue,
   getRetryableItems,
@@ -88,16 +88,16 @@ export interface SyncResult {
   pulled: number;
   pushed: number;
   conflicts: number;
-  photosUploaded?: number;
-  photosDownloaded?: number;
-  photosFailed?: number;
+  photosUploaded?: number | undefined;
+  photosDownloaded?: number | undefined;
+  photosFailed?: number | undefined;
   /** Number of queued items successfully retried */
-  retried?: number;
+  retried?: number | undefined;
   /** Number of queued items that failed retry */
-  retriedFailed?: number;
+  retriedFailed?: number | undefined;
   /** Number of new items queued for retry */
-  queuedForRetry?: number;
-  error?: string;
+  queuedForRetry?: number | undefined;
+  error?: string | undefined;
 }
 
 // Track current sync status
@@ -496,6 +496,7 @@ async function applyWorkOrderChanges(
           record.voiceNoteConfidence = remote.voice_note_confidence;
           record.needsEnrichment = remote.needs_enrichment;
           record.isQuickLog = remote.is_quick_log;
+          record.createdAt = remote.created_at ? new Date(remote.created_at).getTime() : null;
           record.serverUpdatedAt = new Date(remote.updated_at).getTime();
           record.localSyncStatus = 'synced';
         });
@@ -532,6 +533,7 @@ async function applyWorkOrderChanges(
         record.voiceNoteConfidence = remote.voice_note_confidence;
         record.needsEnrichment = remote.needs_enrichment;
         record.isQuickLog = remote.is_quick_log;
+        record.createdAt = remote.created_at ? new Date(remote.created_at).getTime() : null;
         record.localSyncStatus = 'synced';
         record.localUpdatedAt = new Date(remote.updated_at).getTime();
         record.serverUpdatedAt = new Date(remote.updated_at).getTime();
@@ -787,9 +789,9 @@ async function applyWorkOrderPhotoChanges(
             record.localSyncStatus = 'synced';
           });
           applied++;
-        } else if (existing[0].localSyncStatus === 'synced') {
+        } else if (existing[0]?.localSyncStatus === 'synced') {
           // Update existing synced record
-          await existing[0].update(record => {
+          await existing[0]?.update(record => {
             record.remoteUrl = remotePhoto.remote_url;
             record.caption = remotePhoto.caption;
             record.localSyncStatus = 'synced';

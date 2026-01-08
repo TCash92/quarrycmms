@@ -172,10 +172,13 @@ export async function unregisterBackgroundSync(): Promise<void> {
  */
 export async function isBackgroundSyncAvailable(): Promise<BackgroundSyncStatus> {
   try {
-    const [status, registered] = await Promise.all([
+    const [rawStatus, registered] = await Promise.all([
       BackgroundFetch.getStatusAsync(),
       TaskManager.isTaskRegisteredAsync(BACKGROUND_SYNC_TASK),
     ]);
+
+    // Fallback to Denied if status is null
+    const status = rawStatus ?? BackgroundFetch.BackgroundFetchStatus.Denied;
 
     let statusDescription: string;
     switch (status) {

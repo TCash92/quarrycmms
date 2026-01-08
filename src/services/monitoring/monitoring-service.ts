@@ -33,7 +33,7 @@ export interface MonitoringConfig {
 interface UserContext {
   id: string;
   siteId: string;
-  deviceId?: string;
+  deviceId?: string | undefined;
 }
 
 /**
@@ -229,9 +229,9 @@ export function setContext(name: string, context: Record<string, unknown>): void
 /**
  * Force flush pending events (useful before app termination)
  */
-export async function flush(timeout = 2000): Promise<boolean> {
+export async function flush(_timeout = 2000): Promise<boolean> {
   if (!isInitialized) return true;
-  return Sentry.flush(timeout);
+  return Sentry.flush();
 }
 
 export default {
