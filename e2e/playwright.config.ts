@@ -10,8 +10,8 @@ export default defineConfig({
   /* Only match .spec.ts files in the tests directory */
   testMatch: '**/*.spec.ts',
 
-  /* Ignore any files outside e2e/tests */
-  testIgnore: ['**/node_modules/**', '**/src/**'],
+  /* Ignore any files outside e2e/tests, and debug directory */
+  testIgnore: ['**/node_modules/**', '**/src/**', '**/debug/**'],
 
   /* Maximum time one test can run for */
   timeout: 30000,

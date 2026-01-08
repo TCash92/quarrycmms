@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { RootNavigator } from '@/app';
@@ -13,6 +13,7 @@ import {
   stopPeriodicTelemetry,
 } from '@/services/monitoring';
 import { checkDatabaseHealth } from '@/services/recovery';
+import { showAlert } from '@/utils/alert';
 
 // E2E Test Mode Detection
 const IS_E2E_TEST = process.env.EXPO_PUBLIC_E2E_TEST === 'true';
@@ -69,7 +70,7 @@ export default function App(): React.ReactElement {
               });
 
               // Show alert to user about database issues
-              Alert.alert(
+              showAlert(
                 'Database Issue Detected',
                 'Some database issues were detected. You can continue using the app, but consider going to Settings > Reset Local Database if you experience problems.',
                 [{ text: 'OK', style: 'default' }]

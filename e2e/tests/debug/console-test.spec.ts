@@ -1,5 +1,5 @@
 import { test } from '@playwright/test';
-import { seedTestData } from '../helpers/database.helper';
+import { seedTestData } from '../../helpers/database.helper';
 
 test('capture console errors with database seeding', async ({ page }) => {
   // Collect all console messages
