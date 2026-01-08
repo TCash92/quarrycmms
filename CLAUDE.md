@@ -138,7 +138,7 @@ RootNavigator
 ## TypeScript Configuration
 
 Strict mode is fully enabled with additional checks:
-- `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`
+- `noUncheckedIndexedAccess`
 - Path alias: `@/*` → `src/*`
 - Decorators enabled for WatermelonDB models
 
