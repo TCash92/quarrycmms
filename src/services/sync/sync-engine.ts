@@ -876,11 +876,30 @@ export async function pushChanges(): Promise<SyncResult> {
     // Push work orders (sorted by priority)
     for (const wo of sortedWorkOrders) {
       try {
+        // Resolve asset_id to server UUID
+        const assetsCollection = database.get<Asset>('assets');
+        const assets = await assetsCollection.query(Q.where('id', wo.assetId)).fetch();
+        const asset = assets[0];
+        if (!asset?.serverId) {
+          // Asset not synced yet - queue work order for retry
+          console.log(`[Sync] Work order ${wo.id} skipped - asset ${wo.assetId} not synced yet`);
+          await enqueue({
+            recordId: wo.id,
+            tableName: 'work_orders',
+            operation: 'push',
+            priority: calculateWorkOrderPriority({ priority: wo.priority, status: wo.status }),
+            maxAttempts: 5,
+          });
+          queuedForRetry++;
+          continue;
+        }
+        const resolvedAssetId = asset.serverId;
+
         const result = await upsertWorkOrder({
           ...(wo.serverId ? { id: wo.serverId } : {}),
           wo_number: wo.woNumber,
           site_id: wo.siteId,
-          asset_id: wo.assetId,
+          asset_id: resolvedAssetId,
           title: wo.title,
           description: wo.description,
           priority: wo.priority,
@@ -932,9 +951,28 @@ export async function pushChanges(): Promise<SyncResult> {
     // Push meter readings
     for (const mr of pendingMeterReadings) {
       try {
+        // Resolve asset_id to server UUID
+        const assetsCollection = database.get<Asset>('assets');
+        const assets = await assetsCollection.query(Q.where('id', mr.assetId)).fetch();
+        const asset = assets[0];
+        if (!asset?.serverId) {
+          // Asset not synced yet - queue meter reading for retry
+          console.log(`[Sync] Meter reading ${mr.id} skipped - asset ${mr.assetId} not synced yet`);
+          await enqueue({
+            recordId: mr.id,
+            tableName: 'meter_readings',
+            operation: 'push',
+            priority: getDefaultPriority('meter_readings'),
+            maxAttempts: 5,
+          });
+          queuedForRetry++;
+          continue;
+        }
+        const resolvedAssetId = asset.serverId;
+
         const result = await upsertMeterReading({
           ...(mr.serverId ? { id: mr.serverId } : {}),
-          asset_id: mr.assetId,
+          asset_id: resolvedAssetId,
           reading_value: mr.readingValue,
           reading_date: new Date(mr.readingDate).toISOString(),
           recorded_by: mr.recordedBy,
@@ -1134,11 +1172,19 @@ async function syncQueuedRecord(item: RetryQueueItem): Promise<void> {
         // Already synced by another process
         return;
       }
+      // Resolve asset_id to server UUID
+      const assetsCollection = database.get<Asset>('assets');
+      const assets = await assetsCollection.query(Q.where('id', wo.assetId)).fetch();
+      const asset = assets[0];
+      if (!asset?.serverId) {
+        throw new Error('Asset not synced yet');
+      }
+      const resolvedAssetId = asset.serverId;
       const result = await upsertWorkOrder({
         ...(wo.serverId ? { id: wo.serverId } : {}),
         wo_number: wo.woNumber,
         site_id: wo.siteId,
-        asset_id: wo.assetId,
+        asset_id: resolvedAssetId,
         title: wo.title,
         description: wo.description,
         priority: wo.priority,
@@ -1204,9 +1250,17 @@ async function syncQueuedRecord(item: RetryQueueItem): Promise<void> {
       if (mr.localSyncStatus !== 'pending') {
         return;
       }
+      // Resolve asset_id to server UUID
+      const assetsCollection = database.get<Asset>('assets');
+      const assets = await assetsCollection.query(Q.where('id', mr.assetId)).fetch();
+      const asset = assets[0];
+      if (!asset?.serverId) {
+        throw new Error('Asset not synced yet');
+      }
+      const resolvedAssetId = asset.serverId;
       const result = await upsertMeterReading({
         ...(mr.serverId ? { id: mr.serverId } : {}),
-        asset_id: mr.assetId,
+        asset_id: resolvedAssetId,
         reading_value: mr.readingValue,
         reading_date: new Date(mr.readingDate).toISOString(),
         recorded_by: mr.recordedBy,

@@ -15,6 +15,7 @@ import {
   logger,
   resetTelemetryState,
 } from '@/services/monitoring';
+import { performSync } from '@/services/sync';
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -53,6 +54,14 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
           // Set monitoring user context
           setUserContext(restored.user.id, restored.user.siteId);
           logger.info('Session restored', { category: 'auth', userId: restored.user.id });
+
+          // Trigger sync after session restore (non-blocking)
+          performSync().catch(err => {
+            logger.warn('Sync after session restore failed', {
+              category: 'sync',
+              error: err instanceof Error ? err.message : String(err),
+            });
+          });
         } else {
           logger.info('No session found, setting unauthenticated', { category: 'auth' });
           setAuthState({ status: 'unauthenticated' });
@@ -82,6 +91,15 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
         // Set monitoring user context
         setUserContext(result.user.id, result.user.siteId);
         logger.info('Login successful', { category: 'auth', userId: result.user.id });
+
+        // Trigger initial sync after login (non-blocking)
+        performSync().catch(err => {
+          logger.warn('Initial sync after login failed', {
+            category: 'sync',
+            error: err instanceof Error ? err.message : String(err),
+          });
+        });
+
         return { success: true };
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Login failed';

@@ -432,15 +432,36 @@ describe('sync-engine', () => {
     });
 
     it('pushes pending work orders sorted by priority', async () => {
-      const highPriorityWO = createMockWorkOrder({ id: 'wo-high', priority: 'high' });
-      const lowPriorityWO = createMockWorkOrder({ id: 'wo-low', priority: 'low' });
+      const highPriorityWO = createMockWorkOrder({
+        id: 'wo-high',
+        priority: 'high',
+        assetId: 'asset-1',
+      });
+      const lowPriorityWO = createMockWorkOrder({
+        id: 'wo-low',
+        priority: 'low',
+        assetId: 'asset-1',
+      });
+      // Create a mock asset for UUID resolution (synced status so it's not considered pending)
+      const mockAsset = createMockAsset({
+        id: 'asset-1',
+        serverId: 'server-asset-1',
+        localSyncStatus: 'synced',
+      });
 
-      // Mock database.get to return work orders for the work_orders table
+      // Mock database.get to return work orders AND resolve asset lookups
       (database.get as jest.Mock).mockImplementation((tableName: string) => ({
         query: jest.fn().mockReturnValue({
-          fetch: jest
-            .fn()
-            .mockResolvedValue(tableName === 'work_orders' ? [lowPriorityWO, highPriorityWO] : []),
+          fetch: jest.fn().mockImplementation(() => {
+            if (tableName === 'work_orders') {
+              return Promise.resolve([lowPriorityWO, highPriorityWO]);
+            }
+            if (tableName === 'assets') {
+              // Return the mock asset for UUID resolution lookup
+              return Promise.resolve([mockAsset]);
+            }
+            return Promise.resolve([]);
+          }),
         }),
       }));
 
@@ -451,14 +472,34 @@ describe('sync-engine', () => {
     });
 
     it('pushes pending meter readings to server', async () => {
-      const pendingReading = createMockMeterReading();
+      const pendingReading = createMockMeterReading({ assetId: 'asset-1' });
+      // Create a mock asset for UUID resolution (synced status so it's not considered pending)
+      const mockAsset = createMockAsset({
+        id: 'asset-1',
+        serverId: 'server-asset-1',
+        localSyncStatus: 'synced',
+      });
 
-      // Mock database.get to return meter readings for the meter_readings table
+      // Track whether it's the first or subsequent call to assets
+      let assetCallCount = 0;
+      // Mock database.get to return meter readings AND resolve asset lookups
       (database.get as jest.Mock).mockImplementation((tableName: string) => ({
         query: jest.fn().mockReturnValue({
-          fetch: jest
-            .fn()
-            .mockResolvedValue(tableName === 'meter_readings' ? [pendingReading] : []),
+          fetch: jest.fn().mockImplementation(() => {
+            if (tableName === 'meter_readings') {
+              return Promise.resolve([pendingReading]);
+            }
+            if (tableName === 'assets') {
+              assetCallCount++;
+              // First call is for pending assets query (returns empty)
+              // Second call is for UUID resolution (returns the asset)
+              if (assetCallCount === 1) {
+                return Promise.resolve([]); // No pending assets
+              }
+              return Promise.resolve([mockAsset]); // UUID resolution
+            }
+            return Promise.resolve([]);
+          }),
         }),
       }));
 

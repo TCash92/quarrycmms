@@ -8,8 +8,9 @@
  */
 
 import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av';
-import * as FileSystem from 'expo-file-system';
-import { documentDirectory } from 'expo-file-system/legacy';
+import * as FileSystem from 'expo-file-system/legacy';
+
+const { documentDirectory } = FileSystem;
 
 /**
  * Result of a completed voice note recording

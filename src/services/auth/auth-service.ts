@@ -195,8 +195,22 @@ export async function restoreSession(): Promise<{ user: AuthUser; session: Sessi
     return null;
   }
 
-  // Try to fetch fresh user profile if online
+  // Set the session on the Supabase client for authenticated queries
   const supabase = getSupabaseClient();
+  const { error: sessionError } = await supabase.auth.setSession({
+    access_token: validToken,
+    refresh_token: storedData.refreshToken,
+  });
+
+  if (sessionError) {
+    logger.warn('Failed to set session on Supabase client', {
+      category: 'auth',
+      error: sessionError.message,
+    });
+    // Continue anyway - try the query, fallback will handle failure
+  }
+
+  // Try to fetch fresh user profile if online
   try {
     const { data: profile, error } = await supabase
       .from('profiles')

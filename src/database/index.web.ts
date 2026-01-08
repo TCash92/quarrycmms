@@ -93,6 +93,140 @@ if (typeof window !== 'undefined') {
   (window as unknown as { __E2E_DB_STORE__: InMemoryStore }).__E2E_DB_STORE__ = store;
 }
 
+// Auto-seed test data for manual browser testing in E2E mode
+if (typeof window !== 'undefined' && process.env.EXPO_PUBLIC_E2E_TEST === 'true') {
+  const DEFAULT_TEST_ASSETS: RawRecord[] = [
+    {
+      id: 'asset-001',
+      server_id: 'server-asset-001',
+      site_id: 'site-001',
+      asset_number: 'EXC-001',
+      name: 'CAT 320 Excavator',
+      description: 'Primary excavation unit for the north pit',
+      category: 'Heavy Equipment',
+      status: 'operational',
+      location_description: 'Primary Pit - North Section',
+      photo_url: null,
+      meter_type: 'hours',
+      meter_unit: 'Operating Hours',
+      meter_current_reading: 5432,
+      local_sync_status: 'synced',
+      local_updated_at: Date.now(),
+      server_updated_at: Date.now(),
+    },
+    {
+      id: 'asset-002',
+      server_id: 'server-asset-002',
+      site_id: 'site-001',
+      asset_number: 'LDR-002',
+      name: 'Komatsu WA380 Loader',
+      description: 'Wheel loader for stockpile management',
+      category: 'Heavy Equipment',
+      status: 'limited',
+      location_description: 'Stockpile Area',
+      photo_url: null,
+      meter_type: 'hours',
+      meter_unit: 'Operating Hours',
+      meter_current_reading: 3200,
+      local_sync_status: 'synced',
+      local_updated_at: Date.now(),
+      server_updated_at: Date.now(),
+    },
+    {
+      id: 'asset-003',
+      server_id: 'server-asset-003',
+      site_id: 'site-001',
+      asset_number: 'CRU-003',
+      name: 'Primary Jaw Crusher',
+      description: 'Main crushing unit',
+      category: 'Processing',
+      status: 'down',
+      location_description: 'Processing Plant',
+      photo_url: null,
+      meter_type: null,
+      meter_unit: null,
+      meter_current_reading: null,
+      local_sync_status: 'synced',
+      local_updated_at: Date.now(),
+      server_updated_at: Date.now(),
+    },
+  ];
+
+  const DEFAULT_TEST_WORK_ORDERS: RawRecord[] = [
+    {
+      id: 'wo-001',
+      server_id: 'server-wo-001',
+      wo_number: 'WO-2024-001',
+      site_id: 'site-001',
+      asset_id: 'asset-001',
+      title: 'Hydraulic system check',
+      description: 'Routine inspection of hydraulic lines and fittings',
+      priority: 'medium',
+      status: 'open',
+      assigned_to: 'user-tech-001',
+      created_by: 'user-supervisor-001',
+      due_date: Date.now() + 7 * 24 * 60 * 60 * 1000,
+      started_at: null,
+      completed_at: null,
+      completed_by: null,
+      completion_notes: null,
+      failure_type: null,
+      time_spent_minutes: null,
+      signature_image_url: null,
+      signature_timestamp: null,
+      signature_hash: null,
+      verification_code: null,
+      voice_note_url: null,
+      voice_note_confidence: null,
+      needs_enrichment: false,
+      is_quick_log: false,
+      local_sync_status: 'synced',
+      local_updated_at: Date.now(),
+      server_updated_at: Date.now(),
+      created_at: Date.now() - 2 * 24 * 60 * 60 * 1000,
+    },
+    {
+      id: 'wo-002',
+      server_id: 'server-wo-002',
+      wo_number: 'WO-2024-002',
+      site_id: 'site-001',
+      asset_id: 'asset-002',
+      title: 'Replace worn bucket teeth',
+      description: 'Bucket teeth showing significant wear',
+      priority: 'high',
+      status: 'in_progress',
+      assigned_to: 'user-tech-001',
+      created_by: 'user-supervisor-001',
+      due_date: Date.now() + 2 * 24 * 60 * 60 * 1000,
+      started_at: Date.now() - 1 * 60 * 60 * 1000,
+      completed_at: null,
+      completed_by: null,
+      completion_notes: null,
+      failure_type: null,
+      time_spent_minutes: null,
+      signature_image_url: null,
+      signature_timestamp: null,
+      signature_hash: null,
+      verification_code: null,
+      voice_note_url: null,
+      voice_note_confidence: null,
+      needs_enrichment: false,
+      is_quick_log: false,
+      local_sync_status: 'synced',
+      local_updated_at: Date.now(),
+      server_updated_at: Date.now(),
+      created_at: Date.now() - 1 * 24 * 60 * 60 * 1000,
+    },
+  ];
+
+  // Seed on next tick to ensure store is fully initialized
+  setTimeout(() => {
+    store.seed('assets', DEFAULT_TEST_ASSETS);
+    store.seed('work_orders', DEFAULT_TEST_WORK_ORDERS);
+    console.log('[E2E] Auto-seeded test data for manual browser testing');
+  }, 0);
+}
+
 // ============================================================================
 // Mock Relation Class (mimics WatermelonDB's Relation)
 // ============================================================================
@@ -750,6 +884,11 @@ class MockCollection<T extends MockModel> {
       },
       get(target, prop) {
         if (typeof prop === 'string') {
+          // Handle _raw specially - return the raw object itself
+          // This mimics WatermelonDB where record._raw gives direct access to raw data
+          if (prop === '_raw') {
+            return target;
+          }
           // Also support reading (for chained assignments)
           const snakeKey = camelToSnake(prop);
           return target[snakeKey];
